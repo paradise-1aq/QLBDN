@@ -1,0 +1,213 @@
+@model QLBDN.Models.Player
+@{
+    ViewData["Title"] = "Thêm cầu thủ mới";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <style>
+        /* ========== TỔNG THỂ ========== */
+        section {
+            text-align: center;
+        }
+
+        .form-container {
+            max-width: 760px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 22px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+        }
+
+        h2.page-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+        }
+
+        /* ========== FORM GRID ========== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            text-align: left;
+        }
+
+        label {
+            margin-bottom: 6px;
+            color: #0f766e;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1.6px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #f8fafc;
+            transition: 0.25s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #10b981;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.18);
+        }
+
+        /* ========== AVATAR PREVIEW ========== */
+        .avatar-preview img {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #10b981;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn-submit {
+            margin-top: 2rem;
+            padding: 0.9rem 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 14px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.25s;
+            box-shadow: 0 5px 12px rgba(16, 185, 129, 0.28);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            padding: 0.7rem 1.6rem;
+            border-radius: 10px;
+            text-decoration: none;
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+            transition: 0.25s;
+        }
+
+        .btn-back:hover {
+            background: #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+    </style>
+}
+
+<section>
+
+    <!-- Nút quay lại -->
+    <a asp-controller="Player" asp-action="Index" class="btn-back">← Quay lại danh sách</a>
+
+    <h2 class="page-title">➕ Thêm cầu thủ mới</h2>
+
+    <div class="form-container">
+
+        <!-- Cần enctype để upload file -->
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+
+            <div class="form-grid">
+
+                <!-- HỌ TÊN -->
+                <div>
+                    <label asp-for="FullName">Họ tên</label>
+                    <input asp-for="FullName" class="form-input" placeholder="VD: Nguyễn Văn A" required />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <!-- NGÀY SINH -->
+                <div>
+                    <label asp-for="DateOfBirth">Ngày sinh</label>
+                    <input asp-for="DateOfBirth" type="date" class="form-input" />
+                </div>
+
+                <!-- QUỐC TỊCH -->
+                <div>
+                    <label asp-for="Nationality">Quốc tịch</label>
+                    <input asp-for="Nationality" class="form-input" placeholder="VD: Việt Nam" />
+                </div>
+
+                <!-- SỐ ÁO -->
+                <div>
+                    <label asp-for="ShirtNumber">Số áo</label>
+                    <input asp-for="ShirtNumber" type="number" min="1" max="99" class="form-input" />
+                </div>
+
+                <!-- TRẠNG THÁI -->
+                <div>
+                    <label asp-for="Status">Tình trạng</label>
+                    <select asp-for="Status" class="form-input">
+                        <option value="">-- Chọn trạng thái --</option>
+                        <option value="Active">Đang thi đấu</option>
+                        <option value="Injured">Chấn thương</option>
+                        <option value="Suspended">Treo giò</option>
+                        <option value="Retired">Giải nghệ</option>
+                    </select>
+                </div>
+
+                <!-- VAI TRÒ -->
+                <div>
+                    <label asp-for="RoleId">Vị trí thi đấu</label>
+                    <select asp-for="RoleId" class="form-input"
+                            asp-items="@(new SelectList(ViewBag.Roles, "RoleId", "RoleName"))">
+                        <option value="">-- Chọn vị trí --</option>
+                    </select>
+                </div>
+
+                <!-- CÂU LẠC BỘ -->
+                <div>
+                    <label asp-for="ClubId">Câu lạc bộ</label>
+                    <select asp-for="ClubId" class="form-input"
+                            asp-items="@(new SelectList(ViewBag.Clubs, "ClubId", "Name"))">
+                        <option value="">-- Chọn CLB --</option>
+                    </select>
+                </div>
+
+                <!-- ẢNH ĐẠI DIỆN -->
+                <div>
+                    <label asp-for="AvatarFile">Ảnh đại diện</label>
+                    <input asp-for="AvatarFile" type="file" accept="image/*" class="form-input"
+                           onchange="previewImage(event)" />
+
+                    <div class="avatar-preview">
+                        <img id="preview" src="/images/default-avatar.png" alt="Avatar Preview" />
+                    </div>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-submit">💾 Lưu cầu thủ</button>
+        </form>
+    </div>
+
+</section>
+
+@section Scripts {
+    <script>
+        // Preview avatar
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                document.getElementById('preview').src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+}
+

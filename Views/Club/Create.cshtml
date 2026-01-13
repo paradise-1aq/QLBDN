@@ -1,0 +1,107 @@
+@model QLBDN.Models.Club
+
+@{
+    Layout = "~/Views/Shared/_layout.cshtml";
+    ViewData["Title"] = "Thêm câu lạc bộ";
+}
+
+<style>
+    .form-container {
+        max-width: 650px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        border: 1px solid #f1f5f9;
+    }
+
+    .page-title {
+        text-align: center;
+        font-size: 1.9rem;
+        font-weight: 800;
+        color: #059669;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #047857;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.85rem 1rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        background: #fafafa;
+        transition: .25s;
+    }
+    .form-input:focus {
+        border-color: #34d399;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(52,211,153,.2);
+        outline: none;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 0.9rem;
+        margin-top: 1rem;
+        border-radius: 12px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: .25s;
+    }
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, #10b981, #059669);
+        box-shadow: 0 4px 14px rgba(16,185,129,.3);
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1rem;
+        text-decoration: none;
+        color: #0f172a;
+        font-weight: 600;
+        transition: .25s;
+    }
+    .back-link:hover {
+        color: #059669;
+    }
+</style>
+
+<div class="form-container">
+    <a href="/clubs" class="back-link">← Quay lại danh sách</a>
+
+    <h2 class="page-title">➕ Thêm câu lạc bộ mới</h2>
+
+    <form asp-action="Create" method="post">
+        <div class="form-group">
+            <label class="form-label">Tên câu lạc bộ</label>
+            <input asp-for="Name" class="form-input" placeholder="Nhập tên CLB" required />
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Sân vận động</label>
+            <input asp-for="HomeStadium" class="form-input" placeholder="Ví dụ: Hòa Xuân" />
+        </div>
+
+        <button type="submit" class="btn-submit">
+            ✔ Lưu câu lạc bộ
+        </button>
+    </form>
+</div>

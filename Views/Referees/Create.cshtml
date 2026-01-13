@@ -1,0 +1,516 @@
+@model QLBDN.Models.Referee
+
+@{
+    Layout = "~/Views/Shared/_layout.cshtml";
+    ViewData["Title"] = "Thêm trọng tài mới";
+}
+
+@section Styles {
+<style>
+    .create-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    /* ---------------- HEADER ---------------- */
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #059669;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s;
+    }
+
+    .back-link:hover {
+        color: #047857;
+        transform: translateX(-3px);
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #059669;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .page-subtitle {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    /* ---------------- FORM CARD ---------------- */
+    .form-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        border: 1px solid #f1f5f9;
+        animation: fadeIn 0.5s ease;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ---------------- FORM SECTIONS ---------------- */
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .form-label .required {
+        color: #ef4444;
+    }
+
+    .form-label .optional {
+        color: #94a3b8;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .form-input,
+    .form-select {
+        width: 100%;
+        padding: 0.875rem 1.25rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+        background: white;
+        color: #0f172a;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .form-input:hover,
+    .form-select:hover {
+        border-color: #cbd5e1;
+    }
+
+    .form-select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        padding-right: 3rem;
+    }
+
+    .form-input::placeholder {
+        color: #94a3b8;
+    }
+
+    .input-hint {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    .text-danger {
+        color: #dc2626;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        display: block;
+    }
+
+    /* ---------------- LEVEL BADGES ---------------- */
+    .level-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .level-option {
+        display: none;
+    }
+
+    .level-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #475569;
+        background: white;
+    }
+
+    .level-option:checked + .level-label {
+        border-color: #10b981;
+        background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+        color: #047857;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+    }
+
+    .level-label:hover {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+
+    /* ---------------- INFO BOX ---------------- */
+    .info-box {
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        border: 1px solid #93c5fd;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: start;
+        gap: 0.75rem;
+    }
+
+    .info-icon {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-text {
+        font-size: 0.85rem;
+        color: #1e3a8a;
+        line-height: 1.5;
+    }
+
+    /* ---------------- FORM ACTIONS ---------------- */
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .btn-submit {
+        flex: 1;
+        padding: 0.875rem 2rem;
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #10b981, #059669);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .btn-cancel {
+        flex: 0.6;
+        padding: 0.875rem 2rem;
+        background: #e2e8f0;
+        color: #334155;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-cancel:hover {
+        background: #cbd5e1;
+        color: #1e293b;
+    }
+
+    /* ---------------- INPUT ICONS ---------------- */
+    .input-with-icon {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.1rem;
+        color: #94a3b8;
+        pointer-events: none;
+    }
+
+    .input-with-icon .form-input {
+        padding-left: 2.75rem;
+    }
+
+    /* ---------------- RESPONSIVE ---------------- */
+    @@media (max-width: 768px) {
+        .create-container {
+            padding: 1rem 0.75rem;
+        }
+
+        .form-card {
+            padding: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-cancel {
+            flex: 1;
+        }
+
+        .level-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+</style>
+}
+
+<div class="create-container">
+    <a asp-action="Index" class="back-link">
+        <span>←</span>
+        <span>Quay lại danh sách</span>
+    </a>
+
+    <div class="page-header">
+        <h2 class="page-title">
+            <span>➕</span>
+            <span>Thêm trọng tài mới</span>
+        </h2>
+        <p class="page-subtitle">
+            Thêm thông tin trọng tài vào hệ thống quản lý
+        </p>
+    </div>
+
+    <div class="form-card">
+        <form asp-action="Create" method="post">
+
+            <!-- INFO BOX -->
+            <div class="info-box">
+                <div class="info-icon">💡</div>
+                <div class="info-content">
+                    <div class="info-title">Lưu ý khi thêm trọng tài</div>
+                    <div class="info-text">
+                        Vui lòng điền đầy đủ thông tin cơ bản. Các trường có dấu (*) là bắt buộc. UserID chỉ cần điền nếu muốn liên kết với tài khoản người dùng.
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 1: BASIC INFO -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span>👤</span>
+                    <span>Thông tin cơ bản</span>
+                </h3>
+
+                <!-- FULL NAME -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>📝</span>
+                        <span>Họ và tên</span>
+                        <span class="required">*</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">👨‍⚖️</span>
+                        <input asp-for="FullName" 
+                               class="form-input" 
+                               placeholder="VD: Nguyễn Văn A"
+                               required />
+                    </div>
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <!-- DATE OF BIRTH -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>🎂</span>
+                        <span>Ngày sinh</span>
+                    </label>
+                    <input asp-for="DateOfBirth" 
+                           type="date" 
+                           class="form-input" />
+                    <span class="input-hint">Ngày sinh của trọng tài</span>
+                </div>
+            </div>
+
+            <!-- SECTION 2: PROFESSIONAL INFO -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span>🏆</span>
+                    <span>Thông tin nghề nghiệp</span>
+                </h3>
+
+                <!-- EXPERIENCE -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>📊</span>
+                        <span>Số năm kinh nghiệm</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">⏳</span>
+                        <input asp-for="Experience" 
+                               type="number" 
+                               min="0" 
+                               class="form-input"
+                               placeholder="VD: 5" />
+                    </div>
+                    <span class="input-hint">Số năm làm việc trong ngành trọng tài</span>
+                </div>
+
+                <!-- LEVEL -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>🎖️</span>
+                        <span>Cấp độ trọng tài</span>
+                    </label>
+                    <select asp-for="Level" class="form-select">
+                        <option value="">-- Chọn cấp độ --</option>
+                        <option value="FIFA">FIFA</option>
+                        <option value="UEFA">UEFA</option>
+                        <option value="National">National</option>
+                        <option value="Local">Local</option>
+                    </select>
+                    <span class="input-hint">Cấp độ chứng chỉ của trọng tài</span>
+                </div>
+            </div>
+
+            <!-- SECTION 3: SYSTEM INFO -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span>⚙️</span>
+                    <span>Thông tin hệ thống</span>
+                </h3>
+
+                <!-- USER LINK -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>🔗</span>
+                        <span>User ID</span>
+                        <span class="optional">(Tùy chọn)</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">👤</span>
+                        <input asp-for="UserId" 
+                               type="number" 
+                               min="1" 
+                               class="form-input"
+                               placeholder="Nhập ID để liên kết tài khoản" />
+                    </div>
+                    <span class="input-hint">Liên kết với tài khoản người dùng trong hệ thống (nếu có)</span>
+                </div>
+            </div>
+
+            <!-- FORM ACTIONS -->
+            <div class="form-actions">
+                <a asp-action="Index" class="btn-cancel">
+                    <span>✕</span>
+                    <span>Hủy bỏ</span>
+                </a>
+                <button type="submit" class="btn-submit">
+                    <span>💾</span>
+                    <span>Lưu trọng tài</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-focus first input
+        window.addEventListener('load', function() {
+            document.querySelector('[name="FullName"]').focus();
+        });
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const fullName = document.querySelector('[name="FullName"]').value.trim();
+            
+            if (!fullName) {
+                e.preventDefault();
+                alert('Vui lòng nhập họ tên trọng tài!');
+                return false;
+            }
+        });
+    </script>
+}

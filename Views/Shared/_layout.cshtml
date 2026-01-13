@@ -1,0 +1,343 @@
+@*
+    Layout tổng của QLBDN – phiên bản UI nâng cấp + phân quyền menu
+*@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - QLBDN</title>
+
+    <!-- GOOGLE FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        /* ---------------- Sidebar ---------------- */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            width: 240px;
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            padding: 1.75rem 0;
+            overflow-y: auto;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+        }
+
+        .logo-container {
+            padding: 0 1.5rem 1.75rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            display: flex; align-items: center; gap: .75rem;
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            filter: drop-shadow(0 2px 6px rgba(52,211,153,.4));
+        }
+
+        .nav-menu { padding: 0 1rem; }
+        .nav-section { margin-bottom: 2rem; }
+
+        .nav-section-title {
+            color: #64748b;
+            font-size: .72rem;
+            font-weight: 600;
+            letter-spacing: .06em;
+            padding: 0 .75rem;
+            margin-bottom: .4rem;
+        }
+
+        .nav-link {
+            display: flex; align-items: center; gap: .75rem;
+            padding: .8rem .9rem;
+            text-decoration: none;
+            border-radius: 12px;
+            color: #cbd5e1;
+            font-weight: 500;
+            transition: all .22s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(52,211,153,0.12);
+            color: #34d399;
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #34d399, #10b981);
+            color: white !important;
+            box-shadow: 0 4px 14px rgba(52,211,153,0.25);
+        }
+
+        /* ---------------- Main Wrapper ---------------- */
+        .main-wrapper {
+            margin-left: 240px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ---------------- Topbar ---------------- */
+        .topbar {
+            background: white;
+            padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0; z-index: 100;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        }
+
+        .topbar-left h1 {
+            font-size: 1.55rem; font-weight: 700; color: #0f172a;
+        }
+
+        .breadcrumb {
+            margin-top: .25rem;
+            display: flex; gap: .5rem;
+            font-size: .85rem; color: #64748b;
+        }
+
+        .topbar-right { display: flex; gap: 1rem; align-items: center; }
+
+        .search-box { position: relative; }
+        .search-box input {
+            width: 300px;
+            padding: .6rem 1rem .6rem 2.6rem;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .search-icon {
+            position: absolute;
+            top: 50%; left: .9rem;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        /* ---------------- User Info ---------------- */
+        .user-info {
+            display: flex; align-items: center; gap: .75rem;
+            padding: .5rem 1rem;
+            background: #f1f5f9;
+            border-radius: 12px;
+        }
+
+        .user-avatar {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg,#34d399,#10b981);
+            border-radius: 50%;
+            color:white;
+            display:flex; align-items:center; justify-content:center;
+            font-weight:700;
+        }
+
+        /* ---------------- Content ---------------- */
+        .content {
+            flex: 1;
+            padding: 2.5rem;
+        }
+
+        .content-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        main {
+            background:white;
+            border-radius:20px;
+            padding:2.3rem;
+            box-shadow:0 2px 4px rgba(0,0,0,0.06);
+        }
+    </style>
+
+    @RenderSection("Styles", required: false)
+</head>
+
+<body>
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString()?.ToLower() ?? "";
+    var currentPath = Context.Request.Path.Value?.ToLower() ?? "";
+
+    var username = Context.Session.GetString("Username") ?? "Khách";
+    var role = Context.Session.GetString("Role") ?? "User";
+}
+
+<!-- Sidebar -->
+<aside class="sidebar">
+
+    <div class="logo-container">
+        <div class="logo">
+            <span class="logo-icon">⚽</span>
+            <span>QLBDN</span>
+        </div>
+    </div>
+
+    <nav class="nav-menu">
+
+        <div class="nav-section">
+            <div class="nav-section-title">Menu chính</div>
+
+            <!-- 📌 Trang chủ -->
+            @if (role == "Admin")
+            {
+                <a asp-controller="Home" asp-action="Index"
+                   class="nav-link @(currentController == "home" ? "active" : "")">
+                    🏠 Trang chủ Admin
+                </a>
+            }
+            else
+            {
+                <a asp-controller="UserHome" asp-action="Index"
+                   class="nav-link @(currentController == "userhome" ? "active" : "")">
+                    🏠 Trang chủ
+                </a>
+            }
+
+            <!-- 📌 Các menu chỉ Admin mới thấy -->
+            @if (role == "Admin")
+            {
+                <a asp-controller="Club" asp-action="Index"
+                   class="nav-link @(currentController == "club" ? "active" : "")">
+                    🏆 Câu lạc bộ
+                </a>
+
+                <a href="/players"
+                   class="nav-link @(currentPath.StartsWith("/players") ? "active" : "")">
+                    👤 Cầu thủ
+                </a>
+
+                <a asp-controller="Matches" asp-action="Index"
+                   class="nav-link @(currentController == "matches" ? "active" : "")">
+                    📅 Lịch thi đấu
+                </a>
+
+                <a asp-controller="MatchEvents" asp-action="Index"
+                   class="nav-link @(currentController == "matchevent" ? "active" : "")">
+                    🎬 Sự kiện trận đấu
+                </a>
+
+                <a asp-controller="Referees" asp-action="Index"
+                   class="nav-link @(currentController == "referees" ? "active" : "")">
+                    👨‍⚖️ Trọng tài
+                </a>
+            }
+
+            <!-- 📌 Menu User + Admin đều thấy -->
+            <a asp-controller="News" asp-action="Index"
+               class="nav-link @(currentController == "news" ? "active" : "")">
+                📰 Tin tức
+            </a>
+
+            @if (role == "User")
+            {
+                <a asp-controller="Matches" asp-action="Index"
+                   class="nav-link @(currentController == "matches" ? "active" : "")">
+                    📅 Lịch thi đấu
+                </a>
+            }
+
+            <a asp-controller="TicketBooking" asp-action="SelectRound"
+               class="nav-link @(currentPath.Contains("selectround") ? "active" : "")">
+                🎟 Mua vé theo vòng
+            </a>
+
+        </div>
+
+        <!-- 📌 Báo cáo (chỉ Admin) -->
+        @if (role == "Admin")
+        {
+            <div class="nav-section">
+                <div class="nav-section-title">Báo cáo</div>
+
+                <a asp-controller="Reports"
+                asp-action="Index"
+                class="nav-link @(currentController == "reports" ? "active" : "")">
+                    📊 Thống kê
+                </a>
+
+
+                <a href="/standings"
+                   class="nav-link @(currentPath.StartsWith("/standings") ? "active" : "")">
+                    🏅 Bảng xếp hạng
+                </a>
+            </div>
+        }
+        else
+        {
+            <!-- User chỉ thấy BXH -->
+            <div class="nav-section">
+                <div class="nav-section-title">Thông tin</div>
+
+                <a href="/standings"
+                   class="nav-link @(currentPath.StartsWith("/standings") ? "active" : "")">
+                    🏅 Bảng xếp hạng
+                </a>
+            </div>
+        }
+
+        <!-- 📌 Hệ thống (CHỈ ADMIN) -->
+        @if (role == "Admin")
+        {
+            <div class="nav-section">
+                <div class="nav-section-title">Hệ thống</div>
+                <a href="#" class="nav-link">⚙️ Cài đặt</a>
+            </div>
+        }
+
+    </nav>
+</aside>
+
+<!-- Main Wrapper -->
+<div class="main-wrapper">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <h1>@ViewData["Title"]</h1>
+            <div class="breadcrumb">
+                <span>@(role == "Admin" ? "Admin" : "User")</span>
+            </div>
+        </div>
+
+        <div class="topbar-right">
+
+            <div class="user-info">
+                <div class="user-avatar">@username.Substring(0,1).ToUpper()</div>
+                <div>
+                    <div class="user-name">@username</div>
+                    <div class="user-role">@role</div>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <div class="content">
+        <div class="content-inner">
+            <main role="main">@RenderBody()</main>
+        </div>
+    </div>
+
+</div>
+
+@RenderSection("Scripts", required: false)
+
+</body>
+</html>

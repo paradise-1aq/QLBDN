@@ -1,0 +1,165 @@
+@model QLBDN.Models.LoginModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Đăng nhập hệ thống";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"]</title>
+
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+        body {
+            background: #f1f5f9;
+            font-family: "Inter", sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-wrapper {
+            width: 420px;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            animation: fadeIn .4s ease;
+        }
+
+        .title {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: #059669;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 2rem;
+            font-size: .95rem;
+        }
+
+        label {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: .3rem;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: .75rem 1rem;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 1rem;
+            transition: .25s ease;
+            font-size: .95rem;
+        }
+
+        input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16,185,129,.2);
+            outline: none;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: .9rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg,#34d399,#10b981);
+            color: white;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: .25s ease;
+            margin-top: .5rem;
+        }
+
+        .btn-login:hover {
+            background: linear-gradient(135deg,#10b981,#059669);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(16,185,129,.35);
+        }
+
+        .error-msg {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: .8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-size: .9rem;
+            border: 1px solid #fca5a5;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #475569;
+            font-size: .9rem;
+        }
+
+        .register-link a {
+            color: #059669;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="login-wrapper">
+
+        <div class="title">⚽ QLBDN</div>
+        <div class="subtitle">Đăng nhập để tiếp tục quản lý hệ thống</div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-msg">@ViewBag.Error</div>
+        }
+
+        <form asp-action="Login" method="post">
+
+            <label for="username">Tên đăng nhập</label>
+            <input asp-for="Username" placeholder="Nhập tài khoản..." />
+            <span asp-validation-for="Username" class="text-danger"></span>
+
+            <label for="password">Mật khẩu</label>
+            <input asp-for="Password" type="password" placeholder="Nhập mật khẩu..." />
+            <span asp-validation-for="Password" class="text-danger"></span>
+
+            <button class="btn-login">Đăng nhập</button>
+        </form>
+
+        <div class="register-link">
+            Chưa có tài khoản?
+            <a asp-controller="User" asp-action="Register">Đăng ký ngay</a>
+        </div>
+
+    </div>
+
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+</body>
+</html>

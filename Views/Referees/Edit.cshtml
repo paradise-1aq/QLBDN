@@ -1,0 +1,94 @@
+@model QLBDN.Models.Referee
+@{
+    Layout = "~/Views/Shared/_layout.cshtml";
+    ViewData["Title"] = "Chỉnh sửa trọng tài";
+}
+
+@section Styles {
+<style>
+    .form-card {
+        max-width: 700px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        animation: fadeIn .4s ease;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: .75rem 1rem;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        margin-bottom: 1rem;
+        transition: .25s;
+    }
+    .input-field:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16,185,129,.25);
+        outline: none;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg,#34d399,#10b981);
+        color: white;
+        padding: .7rem 1.4rem;
+        border-radius: 12px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: .25s;
+    }
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg,#10b981,#059669);
+    }
+
+    .btn-cancel {
+        padding: .7rem 1.4rem;
+        background: #f1f5f9;
+        border-radius: 12px;
+        text-decoration:none;
+        color:#475569;
+        font-weight:600;
+        margin-left:.5rem;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity:0; transform:translateY(12px); }
+        to { opacity:1; transform:translateY(0); }
+    }
+</style>
+}
+
+<div class="form-card">
+    <h2 style="font-weight:800; color:#059669; margin-bottom:1.5rem;">✏️ Chỉnh sửa trọng tài</h2>
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="RefereeId" />
+
+        <label>Họ tên</label>
+        <input asp-for="FullName" class="input-field" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+
+        <label>Ngày sinh</label>
+        <input asp-for="DateOfBirth" type="date" class="input-field" />
+
+        <label>Kinh nghiệm (năm)</label>
+        <input asp-for="Experience" class="input-field" />
+
+        <label>Cấp độ</label>
+        <select asp-for="Level" class="input-field">
+            <option value="">-- Chọn cấp độ --</option>
+            <option>FIFA</option>
+            <option>UEFA</option>
+            <option>National</option>
+            <option>Local</option>
+        </select>
+
+        <button type="submit" class="btn-submit">💾 Lưu thay đổi</button>
+        <a asp-action="Index" class="btn-cancel">Hủy</a>
+    </form>
+</div>

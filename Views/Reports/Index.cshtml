@@ -1,0 +1,220 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Thống kê";
+}
+
+<style>
+    .stats-header { margin-bottom: 2rem; }
+    .stats-header h2 { font-size: 1.6rem; font-weight: 700; color: #0f172a; }
+    .stats-header p { color: #64748b; margin-top: .3rem; }
+
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 1.6rem;
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+        transition: all .25s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    }
+
+    .stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: white;
+    }
+
+    .icon-club   { background: linear-gradient(135deg, #34d399, #10b981); }
+    .icon-player { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+    .icon-match  { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+    .icon-goal   { background: linear-gradient(135deg, #f87171, #dc2626); }
+
+    .stat-label {
+        font-size: .75rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .stat-value {
+        font-size: 1.9rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: .2rem 0;
+    }
+
+    .stat-sub { font-size: .85rem; color: #94a3b8; }
+
+    /* FIX QUAN TRỌNG */
+    .chart-box {
+        background: linear-gradient(180deg, #ffffff, #f8fafc);
+        border-radius: 22px;
+        padding: 2.2rem;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        margin-bottom: 2.5rem;
+        min-height: 420px;
+    }
+    .chart-box canvas {
+    max-height: 300px;   /* ✅ FIX KÉO DÀI */
+    }
+
+    .chart-box h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 1.2rem;
+        color: #0f172a;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 2rem 0 1rem;
+        color: #0f172a;
+    }
+</style>
+
+<!-- HEADER -->
+<div class="stats-header">
+    <h2>📊 Thống kê giải đấu</h2>
+    <p>Tổng quan dữ liệu hệ thống giải bóng đá</p>
+</div>
+
+<!-- KPI TỔNG -->
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-icon icon-club">🏆</div>
+        <div>
+            <div class="stat-label">Câu lạc bộ</div>
+            <div class="stat-value">@ViewData["TotalClubs"]</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon icon-player">👤</div>
+        <div>
+            <div class="stat-label">Cầu thủ</div>
+            <div class="stat-value">@ViewData["TotalPlayers"]</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon icon-match">📅</div>
+        <div>
+            <div class="stat-label">Trận đấu</div>
+            <div class="stat-value">@ViewData["TotalMatches"]</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon icon-goal">⚽</div>
+        <div>
+            <div class="stat-label">Bàn thắng</div>
+            <div class="stat-value">@ViewData["TotalGoals"]</div>
+        </div>
+    </div>
+</div>
+
+<!-- CLB -->
+<div class="section-title">🏆 Thống kê câu lạc bộ</div>
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-icon icon-goal">🔥</div>
+        <div>
+            <div class="stat-label">CLB xuất sắc nhất</div>
+            <div class="stat-value">@ViewData["BestClubName"]</div>
+            <div class="stat-sub">@ViewData["BestClubWins"] trận thắng</div>
+        </div>
+    </div>
+</div>
+
+<!-- CẦU THỦ -->
+<div class="section-title">⚽ Thống kê cầu thủ</div>
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-icon icon-player">👟</div>
+        <div>
+            <div class="stat-label">Vua phá lưới</div>
+            <div class="stat-value">@ViewData["BestPlayerName"]</div>
+            <div class="stat-sub">@ViewData["BestPlayerGoals"] bàn</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background:linear-gradient(135deg,#facc15,#ca8a04)">🟨</div>
+        <div>
+            <div class="stat-label">Thẻ phạt nhiều nhất</div>
+            <div class="stat-value">@ViewData["MostCardPlayerName"]</div>
+            <div class="stat-sub">@ViewData["MostCardCount"] thẻ</div>
+        </div>
+    </div>
+</div>
+
+<!-- BIỂU ĐỒ -->
+<div class="chart-box">
+    <h3>📈 Thống kê theo mùa giải</h3>
+    <canvas id="statsChart"></canvas>
+</div>
+
+<div class="chart-box">
+    <h3>🏆 Top 5 CLB ghi nhiều bàn</h3>
+    <canvas id="clubGoalsChart"></canvas>
+</div>
+
+<div class="chart-box">
+    <h3>⚽ Top 5 cầu thủ ghi bàn</h3>
+    <canvas id="playerGoalsChart"></canvas>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewData["ChartLabels"]));
+    const matchesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewData["MatchesData"]));
+    const goalsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewData["GoalsData"]));
+
+    if (labels) {
+        new Chart(document.getElementById('statsChart'), {
+            type: 'bar',
+            data: { labels, datasets: [
+                { label: 'Bàn thắng', data: goalsData, backgroundColor: '#60a5fa' },
+                { label: 'Trận đấu', data: matchesData, backgroundColor: '#34d399' }
+            ]},
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    new Chart(document.getElementById('clubGoalsChart'), {
+        type: 'bar',
+        data: { labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewData["TopClubNames"])),
+                datasets: [{ data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewData["TopClubGoals"])), backgroundColor: '#fbbf24' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}} }
+    });
+
+    new Chart(document.getElementById('playerGoalsChart'), {
+        type: 'bar',
+        data: { labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewData["TopPlayerNames"])),
+                datasets: [{ data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewData["TopPlayerGoals"])), backgroundColor: '#f43f5e' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}} }
+    });
+</script>
+}

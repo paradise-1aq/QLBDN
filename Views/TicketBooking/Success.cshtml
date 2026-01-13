@@ -1,0 +1,131 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Thanh toán thành công";
+
+    var name = TempData["BuyerName"]?.ToString() ?? "Khách hàng";
+    var email = TempData["BuyerEmail"]?.ToString() ?? "Không rõ";
+    var bookingId = TempData["BookingId"]?.ToString() ?? "0";
+    var pdfPath = TempData["PdfPath"]?.ToString();
+
+    string qrData = $"QLBDN-BOOKING-ID-{bookingId}";
+    string qrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=240x240&data={qrData}";
+}
+
+<section style="max-width:750px; margin:auto; padding:2rem;">
+
+    <div style="
+        background:white;
+        padding:2.5rem;
+        border-radius:22px;
+        box-shadow:0 6px 20px rgba(0,0,0,0.08);
+        text-align:center;
+    ">
+
+        <!-- ICON CHECK -->
+        <div style="
+            width:85px; height:85px;
+            background:#10b981;
+            color:white;
+            border-radius:50%;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-size:2.3rem;
+            margin:auto;
+            margin-bottom:1.2rem;">
+            ✓
+        </div>
+
+        <!-- TITLE -->
+        <h2 style="
+            font-size:1.9rem;
+            font-weight:800;
+            color:#0f172a;
+            margin-bottom:0.25rem;">
+            Thanh toán thành công!
+        </h2>
+
+        <p style="color:#475569; margin-bottom:0.3rem; font-size:1.05rem;">
+            Cảm ơn <strong>@name</strong> đã đặt vé tại hệ thống QLBDN.
+        </p>
+
+        <p style="color:#64748b; font-size:0.95rem;">
+            Vé đã được tạo thành công. Vui lòng sử dụng mã QR bên dưới để vào cổng.
+        </p>
+
+
+        <!-- QR CODE -->
+        <div style="margin:2rem 0;">
+            <img src="@qrUrl"
+                 style="width:240px; border-radius:18px; box-shadow:0 4px 14px rgba(0,0,0,0.15);" />
+
+            <p style="margin-top:0.8rem; color:#64748b; font-size:0.9rem;">
+                Đưa mã QR này cho nhân viên tại sân để được quét vé.
+            </p>
+        </div>
+
+
+        <!-- BOOKING INFO -->
+        <div style="
+            background:#f1f5f9;
+            padding:1.3rem;
+            border-radius:16px;
+            text-align:left;
+            margin: 1rem auto 1.5rem;
+            max-width:420px;
+            font-size:0.95rem;
+            color:#334155;
+        ">
+            <div style="margin-bottom:8px;">
+                <strong>Mã hoá đơn:</strong> @bookingId
+            </div>
+            <div style="margin-bottom:8px;">
+                <strong>Người đặt:</strong> @name
+            </div>
+            <div>
+                <strong>Email nhận vé:</strong> @email
+            </div>
+        </div>
+
+        <!-- AUTO DOWNLOAD PDF -->
+       @if (pdfPath != null)
+        {
+            <a id="autoDownload" href="@pdfPath" download style="display:none;"></a>
+
+            <script>
+                setTimeout(function () {
+                    document.getElementById("autoDownload").click();
+                }, 1000);
+            </script>
+        }
+
+
+        <!-- ACTION BUTTONS -->
+        <div style="margin-top:1.5rem; display:flex; justify-content:center; gap:1rem;">
+
+            <a href="/"
+               style="
+                    padding:12px 24px;
+                    background:#10b981;
+                    color:white;
+                    font-weight:700;
+                    border-radius:12px;
+                    text-decoration:none;">
+                Về trang chủ
+            </a>
+
+            <a href="/TicketBooking/SelectRound"
+               style="
+                    padding:12px 24px;
+                    background:#0ea5e9;
+                    color:white;
+                    font-weight:700;
+                    border-radius:12px;
+                    text-decoration:none;">
+                Mua thêm vé
+            </a>
+        </div>
+
+    </div>
+
+</section>

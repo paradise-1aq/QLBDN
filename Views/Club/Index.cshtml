@@ -1,0 +1,280 @@
+@model IEnumerable<QLBDN.Models.Club>
+
+@{
+    Layout = "~/Views/Shared/_layout.cshtml";
+    ViewData["Title"] = "Danh sách câu lạc bộ";
+
+    var totalClubs = Model?.Count() ?? 0;
+    string selectedTable = ViewBag.Table as string ?? "";
+}
+
+<style>
+    /* ====== CONTAINER ====== */
+    .clubs-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    /* ====== HEADER ====== */
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #059669;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .page-subtitle {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .add-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.75rem;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+        font-weight: 700;
+        font-size: 0.95rem;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        transition: all 0.3s;
+    }
+
+    .add-button:hover {
+        background: linear-gradient(135deg, #10b981, #059669);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
+    }
+
+    /* ====== FILTER TABS ====== */
+    .filter-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-tab {
+        padding: 0.5rem 1.25rem;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1.5px solid #e5e7eb;
+        transition: all 0.3s;
+    }
+
+    .filter-tab.active {
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+        border-color: #10b981;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    /* ====== GRID ====== */
+    .clubs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    /* ====== CLUB CARD ====== */
+    .club-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        border: 1px solid #f1f5f9;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.3s;
+    }
+
+    .club-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+        border-color: #6ee7b7;
+    }
+
+    .club-logo {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid #6ee7b7;
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        font-size: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        transition: .3s;
+    }
+
+    .club-card:hover .club-logo {
+        transform: scale(1.05);
+        border-color: #34d399;
+    }
+
+    .club-name {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    /* ====== INFO BOX ====== */
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        padding: .5rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .info-label {
+        color: #64748b;
+        display: flex;
+        gap: .4rem;
+        align-items: center;
+    }
+
+    .info-value {
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    /* ====== ACTIONS ====== */
+    .club-actions {
+        display: flex;
+        gap: .5rem;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: .5rem;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: 600;
+        font-size: .85rem;
+        text-decoration: none;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        gap: .3rem;
+        transition: .2s;
+    }
+
+    .btn-edit { background: #10b981; color: white; }
+    .btn-view { background: #e2e8f0; color: #334155; }
+    .btn-delete { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+
+    .btn-edit:hover { background: #059669; }
+    .btn-view:hover { background: #cbd5e1; }
+    .btn-delete:hover { background: #fecaca; }
+</style>
+
+<div class="clubs-container">
+    <!-- HEADER -->
+    <section class="page-header">
+        <h2 class="page-title">
+            <span>🏆</span> Danh sách câu lạc bộ
+        </h2>
+        <p class="page-subtitle">Quản lý thông tin các câu lạc bộ tham dự giải đấu</p>
+
+        <!-- FIXED: đúng route -->
+        <a asp-action="Create" class="add-button">
+            <span>+</span> Thêm câu lạc bộ mới
+        </a>
+    </section>
+
+    <!-- FILTER TABS -->
+    <div class="filter-tabs">
+        <a asp-action="Index" asp-route-table="" class="filter-tab @(string.IsNullOrEmpty(selectedTable) ? "active" : "")">Tất cả</a>
+        <a asp-action="Index" asp-route-table="A" class="filter-tab @(selectedTable=="A" ? "active" : "")">Bảng A</a>
+        <a asp-action="Index" asp-route-table="B" class="filter-tab @(selectedTable=="B" ? "active" : "")">Bảng B</a>
+    </div>
+
+    <!-- EMPTY STATE -->
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon">🏆</div>
+            <div class="empty-text">Chưa có câu lạc bộ nào trong hệ thống</div>
+        </div>
+    }
+    else
+    {
+        <div class="clubs-grid">
+            @foreach (var club in Model)
+            {
+                var playerCount = club.Players?.Count ?? 0;
+
+                <div class="club-card">
+                    <div class="club-logo">🏆</div>
+
+                    <h3 class="club-name">@club.Name</h3>
+
+                    <div class="club-info">
+                        <div class="info-row">
+                            <span class="info-label">🏟 Sân nhà</span>
+                            <span class="info-value">@club.HomeStadium</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">👥 Cầu thủ</span>
+                            <span class="info-value">@playerCount</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">🆔 Mã CLB</span>
+                            <span class="info-value">@club.ClubId</span>
+                        </div>
+                    </div>
+
+                    <div class="club-actions">
+                        <a asp-action="Edit" asp-route-id="@club.ClubId" class="action-btn btn-edit">✏️ Sửa</a>
+                        <a asp-action="Detail" asp-route-id="@club.ClubId" class="action-btn btn-view">🔍 Xem</a>
+
+                        <form asp-action="Delete" asp-route-id="@club.ClubId" method="post" style="flex:1">
+                            <button type="submit"
+                                onclick="return confirm('Bạn có chắc chắn muốn xoá CLB này?')"
+                                class="action-btn btn-delete">🗑 Xóa</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<script>
+    // Animation khi load trang
+    window.addEventListener('load', () => {
+        document.querySelectorAll('.club-card').forEach((c, i) => {
+            c.style.opacity = '0';
+            c.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                c.style.transition = '0.5s';
+                c.style.opacity = '1';
+                c.style.transform = 'translateY(0)';
+            }, i * 40);
+        });
+    });
+</script>

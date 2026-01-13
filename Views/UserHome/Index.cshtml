@@ -1,0 +1,261 @@
+@using QLBDN.Models
+
+@{
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+    ViewData["Title"] = "Trang chủ người dùng";
+
+    // Đảm bảo không bị null
+    var news = ViewBag.News as List<News> ?? new List<News>();
+    var matches = ViewBag.Matches as List<Match> ?? new List<Match>();
+}
+
+@section Styles {
+    <style>
+        .user-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0,2fr) minmax(0,1.4fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+        .hero-left h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #059669;
+            margin-bottom: .5rem;
+        }
+        .hero-left p {
+            color: #4b5563;
+            font-size: .95rem;
+        }
+        .hero-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .hero-stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: .9rem 1.1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .hero-stat-label {
+            font-size: .75rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+        .hero-stat-value {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .hero-banner {
+            background: radial-gradient(circle at top left,#22c55e,#16a34a,#0f766e);
+            border-radius: 18px;
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(16,185,129,0.45);
+        }
+        .hero-banner h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: .5rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: .75rem;
+            color: #059669;
+            display:flex;
+            align-items:center;
+            gap:.4rem;
+        }
+
+        /* NEWS CARD */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: .25s ease;
+        }
+        .news-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+        .news-thumb {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+        }
+        .news-body {
+            padding: 1rem;
+        }
+        .news-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: .5rem;
+            line-height: 1.4;
+        }
+        .news-meta {
+            font-size: .8rem;
+            color: #64748b;
+        }
+
+        /* MATCH LIST */
+        .match-section {
+            margin-top: 2rem;
+        }
+        .match-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            margin-bottom: .75rem;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:1rem;
+        }
+        .match-teams {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .match-sub {
+            font-size: .85rem;
+            color: #64748b;
+        }
+        .match-tag {
+            padding:.25rem .6rem;
+            border-radius:999px;
+            font-size:.75rem;
+            background:#ecfdf5;
+            color:#16a34a;
+            font-weight:600;
+        }
+
+        @@media (max-width: 900px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+}
+
+<div class="user-container">
+
+    <!-- HERO INTRO -->
+    <section class="hero">
+        <div class="hero-left">
+            <p style="font-size:.85rem; text-transform:uppercase; letter-spacing:.08em; color:#6b7280;">
+                Trung tâm quản lý giải đấu bóng đá nội bộ
+            </p>
+            <h1>Chào mừng bạn đến với QLBDN ⚽</h1>
+            <p>
+                Xem lịch thi đấu, cập nhật tin tức mới nhất, theo dõi kết quả
+                và đặt vé theo từng vòng đấu một cách nhanh chóng, tiện lợi.
+            </p>
+
+            <div class="hero-stats">
+                <div class="hero-stat-card">
+                    <div class="hero-stat-label">Tin tức</div>
+                    <div class="hero-stat-value">@news.Count</div>
+                </div>
+                <div class="hero-stat-card">
+                    <div class="hero-stat-label">Trận sắp diễn ra</div>
+                    <div class="hero-stat-value">@matches.Count</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-banner">
+            <h2>🔥 Trải nghiệm giải đấu sống động</h2>
+            <p style="font-size:.9rem; opacity:.95;">
+                Theo dõi đội bóng yêu thích, nắm bắt lịch thi đấu và tin tức nổi bật
+                chỉ trong một giao diện trực quan và hiện đại.
+            </p>
+            <ul style="margin-top:1rem; font-size:.9rem; line-height:1.6;">
+                <li>• Lịch thi đấu được cập nhật liên tục</li>
+                <li>• Hình ảnh & nội dung bài viết hấp dẫn</li>
+                <li>• Đặt vé nhanh, xem thông tin từng vòng đấu</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ⭐ Tin tức mới nhất -->
+    <h2 class="section-title">📰 Tin tức nổi bật</h2>
+
+    @if (news.Count == 0)
+    {
+        <p>Chưa có tin tức nào.</p>
+    }
+    else
+    {
+        <div class="news-grid">
+            @foreach (var n in news)
+            {
+                <div class="news-card">
+                    <img src="@n.ImageUrl" class="news-thumb" alt="News image"/>
+
+                    <div class="news-body">
+                        <div class="news-title">@n.Title</div>
+                        <div class="news-meta">
+                            @n.PostedDate?.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- ⭐ Trận đấu sắp diễn ra -->
+    <div class="match-section">
+        <h2 class="section-title">⚽ Trận đấu sắp diễn ra</h2>
+
+        @if (matches == null || matches.Count == 0)
+        {
+            <p>Không có trận đấu nào sắp diễn ra.</p>
+        }
+        else
+        {
+            @foreach (var m in matches)
+            {
+                var ordered = (m.MatchDetails ?? new List<MatchDetail>())
+                    .OrderBy(d => d.IsHomeTeam == true ? 0 : 1)
+                    .ToList();
+
+                var home = ordered.Count > 0 ? ordered[0].Club?.Name : "N/A";
+                var away = ordered.Count > 1 ? ordered[1].Club?.Name : "N/A";
+
+                <div class="match-card">
+                    <div>
+                        <div class="match-teams">@home vs @away</div>
+                        <div class="match-sub">
+                            🕒 @m.DateTime?.ToString("dd/MM/yyyy HH:mm") <br />
+                            📍 @m.Stadium <br />
+                            🏆 @m.Round?.RoundName
+                        </div>
+                    </div>
+                    <span class="match-tag">Sắp diễn ra</span>
+                </div>
+            }
+        }
+    </div>
+</div>

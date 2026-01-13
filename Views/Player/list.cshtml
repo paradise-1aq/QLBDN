@@ -1,0 +1,490 @@
+@model IEnumerable<QLBDN.Models.Player>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Danh sách cầu thủ";
+    var totalPlayers = ViewBag.TotalPlayers ?? 0;  
+    var currentPage = ViewBag.CurrentPage ?? 1;
+    var totalPages = ViewBag.TotalPages ?? 1;
+}
+
+@section Styles {
+<style>
+    .players-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #059669;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .page-subtitle {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .add-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.75rem;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+        font-weight: 700;
+        font-size: 0.95rem;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        transition: all 0.3s;
+    }
+
+    .add-button:hover {
+        background: linear-gradient(135deg, #10b981, #059669);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
+    }
+
+    .stats-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border-radius: 12px;
+        padding: 0.625rem 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        font-size: 0.9rem;
+        color: #0f172a;
+        margin-bottom: 2rem;
+        border: 1px solid #f1f5f9;
+    }
+
+    .stats-badge strong {
+        color: #059669;
+        margin-left: 0.25rem;
+        font-weight: 700;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-text {
+        color: #64748b;
+        font-size: 1.1rem;
+    }
+
+    .player-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .player-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        border: 1px solid #f1f5f9;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.3s;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .player-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+        border-color: #6ee7b7;
+    }
+
+    .player-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #6ee7b7;
+        margin-bottom: 1rem;
+        transition: all 0.3s;
+    }
+
+    .player-avatar-placeholder {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid #6ee7b7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        margin-bottom: 1rem;
+        transition: all 0.3s;
+    }
+
+    .player-card:hover .player-avatar,
+    .player-card:hover .player-avatar-placeholder {
+        border-color: #34d399;
+        transform: scale(1.05);
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+    }
+
+    .player-name {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 1rem;
+        text-align: center;
+        line-height: 1.3;
+    }
+
+    .player-info {
+        width: 100%;
+        margin-bottom: 1.25rem;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        font-size: 0.85rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: #0f172a;
+        text-align: right;
+        max-width: 60%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .shirt-number {
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+        padding: 0.15rem 0.5rem;
+        border-radius: 6px;
+        font-weight: 700;
+    }
+
+    .actions {
+        display: flex;
+        gap: 0.5rem;
+        width: 100%;
+        margin-top: auto;
+    }
+
+    .btn-edit {
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+
+    .btn-edit:hover {
+        background: linear-gradient(135deg, #10b981, #059669);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-delete {
+        flex: 1;
+        padding: 0.5rem;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        background: #fee2e2;
+        color: #dc2626;
+        border: 1.5px solid #fca5a5;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+    }
+
+    .btn-delete:hover {
+        background: #fecaca;
+        border-color: #f87171;
+        color: #b91c1c;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+
+    .page-link {
+        padding: 0.6rem 1rem;
+        background: white;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        font-weight: 600;
+        color: #059669;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+    .page-link:hover {
+        background: #f0fdf4;
+        border-color: #6ee7b7;
+    }
+
+    .page-link.active {
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+        border-color: #10b981;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    @@media (max-width: 768px) {
+        .players-container {
+            padding: 1rem 0.75rem;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+        }
+
+        .player-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+</style>
+}
+
+<main>
+    <div class="players-container">
+        <!-- PAGE HEADER -->
+        <section class="page-header">
+            <h2 class="page-title">
+                <span>⚽</span>
+                <span>Danh sách cầu thủ</span>
+            </h2>
+            <p class="page-subtitle">
+                Quản lý thông tin cầu thủ tham gia giải đấu
+            </p>
+
+            <a href="/players/new" class="add-button">
+                <span>+</span>
+                <span>Thêm cầu thủ mới</span>
+            </a>
+        </section>
+
+        <!-- STATS BADGE -->
+        <div style="text-align: center;">
+            <div class="stats-badge">
+                <span>Tổng số cầu thủ:</span>
+                <strong>@totalPlayers</strong>
+            </div>
+        </div>
+
+        <!-- PLAYERS LIST -->
+        @if (Model != null && Model.Any())
+        {
+            <div class="player-grid">
+                @foreach (var p in Model)
+                {
+                    <div class="player-card"
+                         ondblclick="openDetails(@p.PlayerId)"
+                         onclick="cardClick(event, @p.PlayerId)"
+                         title="Double-click để xem chi tiết">
+
+                        <!-- AVATAR -->
+                        @if (!string.IsNullOrEmpty(p.AvatarUrl))
+                        {
+                            <img src="@p.AvatarUrl" class="player-avatar" alt="Avatar" />
+                        }
+                        else
+                        {
+                            <div class="player-avatar-placeholder">⚽</div>
+                        }
+
+                        <!-- NAME -->
+                        <h3 class="player-name">@p.FullName</h3>
+
+                        <!-- INFO -->
+                        <div class="player-info">
+                            <div class="info-row">
+                                <span class="info-label">
+                                    <span>🏟️</span>
+                                    <span>CLB</span>
+                                </span>
+                                <span class="info-value" title="@(p.Club?.Name ?? "")">
+                                    @(p.Club?.Name ?? "Chưa có CLB")
+                                </span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">
+                                    <span>📍</span>
+                                    <span>Vị trí</span>
+                                </span>
+                                <span class="info-value">
+                                    @(p.Role?.RoleName ?? "Chưa xác định")
+                                </span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">
+                                    <span>🇻🇳</span>
+                                    <span>Quốc tịch</span>
+                                </span>
+                                <span class="info-value">
+                                    @p.Nationality
+                                </span>
+                            </div>
+
+                            <div class="info-row">
+                                <span class="info-label">
+                                    <span>🎽</span>
+                                    <span>Số áo</span>
+                                </span>
+                                <span class="info-value">
+                                    @if (p.ShirtNumber.HasValue && p.ShirtNumber > 0)
+                                    {
+                                        <span class="shirt-number">@p.ShirtNumber</span>
+                                    }
+                                    else
+                                    {
+                                        <span>—</span>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="actions">
+                            <a href="/players/@p.PlayerId/edit"
+                               class="btn-edit"
+                               onclick="event.stopPropagation();">
+                                <span>✏️</span>
+                                <span>Sửa</span>
+                            </a>
+
+                            <form asp-action="Delete"
+                                  asp-route-id="@p.PlayerId"
+                                  method="post"
+                                  onsubmit="event.stopPropagation();"
+                                  style="flex: 1; margin: 0;">
+                                <button type="submit"
+                                        class="btn-delete"
+                                        onclick="return confirm('Xóa cầu thủ này?')">
+                                    <span>🗑️</span>
+                                    <span>Xóa</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            @if (totalPages > 1)
+            {
+                <div class="pagination">
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <a href="/players?page=@i"
+                           class="page-link @(i == currentPage ? "active" : "")">@i</a>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <p class="empty-text">Chưa có cầu thủ nào trong hệ thống</p>
+            </div>
+        }
+    </div>
+</main>
+
+@section Scripts {
+<script>
+    function openDetails(id) {
+        window.location.href = "/players/" + id;
+    }
+
+    function cardClick(event, id) {
+        const target = event.target;
+
+        if (target.closest("a") || target.closest("form") || target.tagName === "BUTTON") {
+            return; // Bấm nút thì không mở details
+        }
+
+        window.location.href = "/players/" + id;
+    }
+
+    // Add animation on load
+    window.addEventListener('load', function() {
+        const cards = document.querySelectorAll('.player-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 50);
+        });
+    });
+</script>
+}

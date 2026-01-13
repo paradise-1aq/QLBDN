@@ -1,0 +1,268 @@
+@model QLBDN.Models.Match
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Mua vé";
+}
+
+<style>
+   /* =============== BUY TICKET PAGE =============== */
+
+/* Layout container */
+.buy-ticket-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Header */
+.page-header {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    padding: 1.75rem 2rem;
+    border-radius: 16px;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #065f46;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.page-subtitle {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #047857;
+    margin-top: 0.5rem;
+}
+
+/* Form container */
+.ticket-form-card {
+    background: white;
+    padding: 2.25rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* Match info block */
+.match-info-box {
+    background: #fafbfc;
+    padding: 1.5rem;
+    border-radius: 14px;
+    border: 1px solid #f1f5f9;
+    margin-bottom: 2rem;
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.info-label {
+    min-width: 130px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-value {
+    flex: 1;
+    font-weight: 500;
+    color: #475569;
+}
+
+/* Status badges */
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: inline-flex;
+    gap: 0.4rem;
+}
+
+.status-completed {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #d1fae5;
+}
+
+.status-scheduled {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #dbeafe;
+}
+
+.status-ongoing {
+    background: #fefce8;
+    color: #ca8a04;
+    border: 1px solid #fef08a;
+}
+
+/* Form inputs */
+.form-group {
+    margin-bottom: 1.75rem;
+}
+
+.form-label {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+    color: #047857;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    border: 1.5px solid #e5e7eb;
+    font-size: 1rem;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #6ee7b7;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.1);
+}
+
+/* Price preview box */
+.price-preview {
+    background: linear-gradient(135deg, #f0fdf4, #d1fae5);
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #a7f3d0;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+}
+
+.price-row:last-child {
+    border-top: 2px solid #a7f3d0;
+    padding-top: 0.75rem;
+    font-size: 1.1rem;
+}
+
+/* Submit button */
+.submit-button {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 12px;
+    background: #6ee7b7;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #065f46;
+    border: none;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.submit-button:hover {
+    background: #34d399;
+    transform: translateY(-2px);
+}
+
+.submit-button:active {
+    transform: scale(0.98);
+}
+
+</style>
+
+<section class="buy-ticket-container">
+
+    <div class="page-header">
+        <h2 class="page-title">🎫 Mua vé trận đấu</h2>
+        <p class="page-subtitle">Trận #@Model.MatchId - Điền thông tin để hoàn tất</p>
+    </div>
+
+    <div class="ticket-form-card">
+
+        <div class="match-info-box">
+            <div class="info-row">
+                <div class="info-label">📅 Ngày thi đấu:</div>
+                <div class="info-value">@Model.DateTime?.ToString("dd/MM/yyyy HH:mm")</div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">📍 Sân vận động:</div>
+                <div class="info-value">@Model.Stadium</div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">📊 Trạng thái:</div>
+                <div class="info-value">
+                    @if (Model.Status == "Completed")
+                    {
+                        <span class="status-badge status-completed">✓ Đã kết thúc</span>
+                    }
+                    else if (Model.Status == "Scheduled")
+                    {
+                        <span class="status-badge status-scheduled">🕐 Sắp diễn ra</span>
+                    }
+                    else if (Model.Status == "Ongoing")
+                    {
+                        <span class="status-badge status-ongoing">⚡ Đang diễn ra</span>
+                    }
+                    else
+                    {
+                        <span class="status-badge">@Model.Status</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <form method="post" action="/TicketBooking/Buy">
+            <input type="hidden" name="matchId" value="@Model.MatchId" />
+
+            <div class="form-group">
+                <label class="form-label">🎟️ Số lượng vé</label>
+                <input type="number" name="quantity" min="1" max="10" value="1" id="quantityInput" class="form-input" />
+            </div>
+
+            <div class="price-preview">
+                <div class="price-row">
+                    <span>Giá vé:</span>
+                    <span>100.000 ₫</span>
+                </div>
+                <div class="price-row">
+                    <span>Số lượng:</span>
+                    <span id="quantityDisplay">1</span>
+                </div>
+                <div class="price-row">
+                    <span>Tổng thanh toán:</span>
+                    <span id="totalPrice">100.000 ₫</span>
+                </div>
+            </div>
+
+            <button class="submit-button" type="submit">✓ Xác nhận mua vé</button>
+        </form>
+    </div>
+</section>
+
+<script>
+    const q = document.getElementById("quantityInput");
+    const qD = document.getElementById("quantityDisplay");
+    const tP = document.getElementById("totalPrice");
+
+    function update() {
+        const qty = parseInt(q.value) || 1;
+        qD.textContent = qty;
+        tP.textContent = (qty * 100000).toLocaleString("vi-VN") + " ₫";
+    }
+
+    q.addEventListener("input", update);
+    q.addEventListener("change", update);
+    update();
+</script>

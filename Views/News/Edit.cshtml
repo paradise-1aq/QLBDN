@@ -1,0 +1,206 @@
+@model QLBDN.Models.News
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Chỉnh sửa bài viết";
+}
+
+@section Styles {
+<style>
+    :root {
+        --primary: #10b981;
+        --primary-dark: #059669;
+        --primary-light: #34d399;
+        --text-dark: #0f172a;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+        --bg-soft: #f8fafc;
+    }
+
+    .page-wrapper {
+        max-width: 950px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        animation: fadeUp .4s ease;
+    }
+
+    @@keyframes fadeUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-card {
+        background: white;
+        padding: 2.3rem;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 16px rgba(0,0,0,.05);
+    }
+
+    .form-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--primary-dark);
+        margin-bottom: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+    }
+
+    .form-title span.icon {
+        font-size: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.4rem;
+    }
+
+    label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: .45rem;
+        display: block;
+        font-size: .95rem;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: .85rem 1rem;
+        border-radius: 12px;
+        border: 2px solid var(--border);
+        font-size: 1rem;
+        background: white;
+        transition: .25s ease;
+    }
+
+    input:focus, textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(16,185,129,.22);
+        outline: none;
+    }
+
+    /* Buttons */
+    .form-actions {
+        margin-top: 2rem;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-submit {
+        padding: .9rem 1.8rem;
+        background: linear-gradient(135deg,var(--primary-light),var(--primary));
+        border-radius: 12px;
+        color: white;
+        font-size: 1rem;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        transition: .25s ease;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg,var(--primary),var(--primary-dark));
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(16,185,129,.35);
+    }
+
+    .btn-back {
+        padding: .9rem 1.4rem;
+        border-radius: 12px;
+        border: 2px solid var(--border);
+        text-decoration: none;
+        font-weight: 600;
+        color: var(--text-muted);
+        transition: .25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+    }
+
+    .btn-back:hover {
+        border-color: var(--primary);
+        color: var(--primary-dark);
+        background: var(--bg-soft);
+        transform: translateY(-2px);
+    }
+</style>
+}
+
+
+<div class="page-wrapper">
+    <div class="form-card">
+
+        <div class="form-title">
+            <span class="icon">✏️</span>
+            Chỉnh sửa bài viết
+        </div>
+
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="NewsId" />
+
+            <!-- TIÊU ĐỀ -->
+            <div class="form-group">
+                <label for="Title">Tiêu đề bài viết</label>
+                <input asp-for="Title" placeholder="Nhập tiêu đề bài viết..." />
+            </div>
+
+            <!-- NỘI DUNG -->
+            <div class="form-group">
+                <label for="Content">Nội dung bài viết</label>
+                <textarea id="editor" asp-for="Content"></textarea>
+            </div>
+
+            <!-- ẢNH -->
+            <div class="form-group">
+                <label for="ImageUrl">Ảnh đại diện (URL)</label>
+                <input asp-for="ImageUrl" placeholder="https://example.com/image.jpg" />
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    💾 Lưu thay đổi
+                </button>
+
+                <a asp-action="Index" class="btn-back">
+                    ← Quay lại
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    <!-- TinyMCE (Không cần API Key) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
+
+    <script>
+        tinymce.init({
+            selector: '#editor',
+            height: 480,
+            plugins: 'link image media table lists code emoticons fullscreen',
+            toolbar:
+                'undo redo | styles | bold italic underline | forecolor backcolor | ' +
+                'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ' +
+                'link image media table | emoticons | fullscreen | code',
+
+            menubar: false,
+            branding: false,
+
+            content_style: `
+                body {
+                    font-family: 'Inter', sans-serif;
+                    font-size: 15px;
+                    line-height: 1.6;
+                    color: #1e293b;
+                    padding: 1rem;
+                }
+            `
+        });
+    </script>
+}

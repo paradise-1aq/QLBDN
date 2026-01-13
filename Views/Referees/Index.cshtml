@@ -1,0 +1,288 @@
+@model IEnumerable<QLBDN.Models.Referee>
+
+@{
+    Layout = "~/Views/Shared/_layout.cshtml";
+    ViewData["Title"] = "Danh sách trọng tài";
+}
+
+@section Styles {
+<style>
+    .page-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    /* PAGE HEADER */
+    .page-header {
+        background: white;
+        padding: 2rem;
+        border-radius: 18px;
+        box-shadow: 0 3px 14px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 2.2rem;
+        animation: fadeIn .4s ease;
+    }
+    .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        display: flex;
+        gap: .6rem;
+        color: #059669;
+        align-items: center;
+    }
+
+    /* BUTTON */
+    .btn-add {
+        background: linear-gradient(135deg, #34d399, #10b981);
+        padding: .85rem 1.6rem;
+        border-radius: 12px;
+        color: white;
+        font-weight: 700;
+        text-decoration: none;
+        transition: .2s ease;
+        box-shadow: 0 4px 12px rgba(16,185,129,0.25);
+    }
+    .btn-add:hover {
+        background: linear-gradient(135deg, #10b981, #059669);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(16,185,129,0.35);
+    }
+
+    /* SEARCH BAR */
+    .filter-bar {
+        margin-top: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .search-input {
+        flex: 1;
+        min-width: 260px;
+        padding: .75rem 1rem;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        transition: .25s ease;
+    }
+    .search-input:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16,185,129,.2);
+        outline: none;
+    }
+    .level-select {
+        min-width: 180px;
+        padding: .75rem 1rem;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        transition: .25s ease;
+    }
+    .level-select:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16,185,129,.2);
+        outline: none;
+    }
+
+    /* GRID */
+    .referee-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        animation: fadeIn .5s ease;
+    }
+
+    /* CARD */
+    .referee-card {
+        background: white;
+        padding: 1.6rem;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+        transition: .3s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .referee-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 24px rgba(16,185,129,0.22);
+        border-color: #6ee7b7;
+    }
+
+    /* AVATAR */
+    .avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: linear-gradient(135deg,#34d399,#10b981);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-weight: 800;
+        font-size: 1.6rem;
+        box-shadow: 0 4px 12px rgba(16,185,129,0.4);
+        margin-bottom: .8rem;
+    }
+
+    .referee-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .referee-level {
+        font-size: .9rem;
+        font-weight: 600;
+        color: #059669;
+        background: #ecfdf5;
+        padding: .4rem .8rem;
+        border-radius: 8px;
+        display: inline-block;
+    }
+
+    .referee-info {
+        color: #64748b;
+        font-size: .9rem;
+    }
+
+    /* CARD ACTIONS */
+    .card-actions {
+        display: flex;
+        gap: .6rem;
+        margin-top: .5rem;
+    }
+    .btn-action {
+        flex: 1;
+        text-align: center;
+        padding: .55rem;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid;
+        transition: .25s ease;
+    }
+    .btn-view {
+        border-color: #e2e8f0;
+        background: #f1f5f9;
+        color: #475569;
+    }
+    .btn-view:hover {
+        background: #e2e8f0;
+        transform: translateY(-1px);
+    }
+    .btn-edit {
+        background: #10b981;
+        color: white;
+        border-color: #059669;
+    }
+    .btn-edit:hover {
+        background: #059669;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(16,185,129,.3);
+    }
+    .btn-delete {
+        background: #fee2e2;
+        color: #dc2626;
+        border-color: #fecaca;
+    }
+    .btn-delete:hover {
+        background: #fecaca;
+        transform: translateY(-2px);
+    }
+
+    /* ANIMATION */
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px);}
+        to   { opacity: 1; transform: translateY(0);}
+    }
+</style>
+}
+
+<div class="page-wrapper">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="header-top">
+            <h2 class="page-title">👨‍⚖️ Danh sách trọng tài</h2>
+
+            <a asp-action="Create" class="btn-add">
+                ➕ Thêm trọng tài
+            </a>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filter-bar">
+            <input type="text" id="searchInput" placeholder="Tìm theo tên..." class="search-input" />
+
+            <select id="levelFilter" class="level-select">
+                <option value="">Tất cả cấp độ</option>
+
+                @foreach (var lvl in ViewBag.Levels as List<string>)
+                {
+                    <option value="@lvl">@lvl</option>
+                }
+            </select>
+
+        </div>
+    </div>
+
+    <!-- GRID -->
+    <div class="referee-grid" id="refereeGrid">
+        @foreach (var r in Model)
+        {
+            var initials = r.FullName?.Split(' ').Last().Substring(0, 1).ToUpper() ?? "R";
+            var age = r.DateOfBirth.HasValue ? (DateTime.Now.Year - r.DateOfBirth.Value.Year) : (int?)null;
+            var matchCount = r.RefereeMatches?.Count() ?? 0;
+
+            <div class="referee-card" data-name="@r.FullName" data-level="@r.Level">
+                <div class="avatar">@initials</div>
+
+                <div class="referee-name">@r.FullName</div>
+                <div class="referee-level">@r.Level</div>
+
+                <div class="referee-info">🎂 @(age.HasValue ? age + " tuổi" : "Không rõ năm sinh")</div>
+                <div class="referee-info">🧭 @(r.Experience ?? 0) năm kinh nghiệm</div>
+                <div class="referee-info">📘 @matchCount trận đã bắt</div>
+
+                <div class="card-actions">
+                    <a asp-action="Details" asp-route-id="@r.RefereeId" class="btn-action btn-view">👁 Xem</a>
+                    <a asp-action="Edit" asp-route-id="@r.RefereeId" class="btn-action btn-edit">✏️ Sửa</a>
+                    <a asp-action="Delete" asp-route-id="@r.RefereeId" class="btn-action btn-delete">🗑 Xóa</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const searchInput = document.getElementById("searchInput");
+    const levelFilter = document.getElementById("levelFilter");
+    const grid = document.getElementById("refereeGrid");
+
+    function filterCards() {
+        const search = searchInput.value.toLowerCase();
+        const level = levelFilter.value;
+
+        [...grid.children].forEach(card => {
+            const name = card.dataset.name.toLowerCase();
+            const lv = card.dataset.level;
+
+            const matchName = name.includes(search);
+            const matchLevel = !level || lv === level;
+
+            card.style.display = (matchName && matchLevel) ? "block" : "none";
+        });
+    }
+
+    searchInput.addEventListener("input", filterCards);
+    levelFilter.addEventListener("change", filterCards);
+</script>
+}

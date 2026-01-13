@@ -1,0 +1,566 @@
+@model QLBDN.Models.MatchEvent
+
+@{
+    Layout = "~/Views/Shared/_layout.cshtml";
+    ViewData["Title"] = "Thêm sự kiện trận đấu";
+
+    var matches = ViewBag.Matches as List<QLBDN.Models.Match>;
+    var players = ViewBag.Players as List<QLBDN.Models.Player>;
+    var eventTypes = ViewBag.EventTypes as List<string>;
+}
+
+@section Styles {
+<style>
+    .create-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    /* ---------------- HEADER ---------------- */
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #059669;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s;
+    }
+
+    .back-link:hover {
+        color: #047857;
+        transform: translateX(-3px);
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #059669;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .page-subtitle {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    /* ---------------- MATCH INFO BOX ---------------- */
+    .match-info-box {
+        background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #a7f3d0;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+    }
+
+    .match-info-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        color: #047857;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.75rem;
+    }
+
+    .match-info-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    .info-icon {
+        font-size: 1.1rem;
+    }
+
+    /* ---------------- FORM CARD ---------------- */
+    .form-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        border: 1px solid #f1f5f9;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .form-label .required {
+        color: #ef4444;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+        width: 100%;
+        padding: 0.875rem 1.25rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+        background: white;
+        color: #0f172a;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+        outline: none;
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .form-input:hover,
+    .form-select:hover,
+    .form-textarea:hover {
+        border-color: #cbd5e1;
+    }
+
+    .form-select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        padding-right: 3rem;
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+        font-family: inherit;
+    }
+
+    .input-hint {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    /* ---------------- FORM ACTIONS ---------------- */
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .btn-submit {
+        flex: 1;
+        padding: 0.875rem 2rem;
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #10b981, #059669);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .btn-cancel {
+        flex: 0.6;
+        padding: 0.875rem 2rem;
+        background: #e2e8f0;
+        color: #334155;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-cancel:hover {
+        background: #cbd5e1;
+        color: #1e293b;
+    }
+
+    /* ---------------- EVENT TYPE BADGES ---------------- */
+    .event-type-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .event-type-option {
+        display: none;
+    }
+
+    .event-type-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #475569;
+        background: white;
+    }
+
+    .event-type-option:checked + .event-type-label {
+        border-color: #10b981;
+        background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+        color: #047857;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+    }
+
+    .event-type-label:hover {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+
+    /* ---------------- LOADING STATE ---------------- */
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .loading-overlay.active {
+        display: flex;
+    }
+
+    .loading-spinner {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ---------------- RESPONSIVE ---------------- */
+    @@media (max-width: 768px) {
+        .create-container {
+            padding: 1rem 0.75rem;
+        }
+
+        .form-card {
+            padding: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+        }
+
+        .match-info-content {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-cancel {
+            flex: 1;
+        }
+
+        .event-type-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+}
+
+<div class="create-container">
+    <a href="javascript:history.back()" class="back-link">
+        <span>←</span>
+        <span>Quay lại</span>
+    </a>
+
+    <div class="page-header">
+        <h2 class="page-title">
+            <span>➕</span>
+            <span>Thêm sự kiện trận đấu</span>
+        </h2>
+        <p class="page-subtitle">
+            Ghi nhận các sự kiện quan trọng trong trận đấu
+        </p>
+    </div>
+
+    <!-- MATCH INFORMATION -->
+    @if (matches != null && Model.MatchID > 0)
+    {
+        var match = matches.FirstOrDefault(m => m.MatchId == Model.MatchID);
+
+        if (match != null)
+        {
+            <div class="match-info-box">
+                <div class="match-info-header">
+                    <span>⚽</span>
+                    <span>Thông tin trận đấu</span>
+                </div>
+                <div class="match-info-content">
+                    <div class="info-item">
+                        <span class="info-icon">🆔</span>
+                        <span>Mã: @match.MatchId</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">🏟️</span>
+                        <span>@(match.Stadium ?? "Chưa xác định")</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">📅</span>
+                        <span>@match.DateTime?.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+    <div class="form-card">
+        <form asp-action="Create" method="post" id="eventForm">
+
+            <!-- SECTION 1: MATCH & PLAYER -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span>🎯</span>
+                    <span>Thông tin cơ bản</span>
+                </h3>
+
+                <!-- MATCH SELECT -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>🏆</span>
+                        <span>Chọn trận đấu</span>
+                        <span class="required">*</span>
+                    </label>
+                    <select asp-for="MatchID" id="matchSelector" class="form-select" required>
+                        <option value="">-- Chọn trận đấu --</option>
+                        @foreach (var m in matches)
+                        {
+                            var selected = m.MatchId == Model.MatchID ? "selected" : "";
+                            <option value="@m.MatchId" selected="@selected">
+                                @($"#{m.MatchId} • {m.Stadium} • {m.DateTime:dd/MM HH:mm}")
+                            </option>
+                        }
+                    </select>
+                    <span class="input-hint">Chọn trận đấu để tải danh sách cầu thủ</span>
+                </div>
+
+                <!-- PLAYER SELECT -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>👤</span>
+                        <span>Cầu thủ</span>
+                        <span class="required">*</span>
+                    </label>
+                    <select asp-for="PlayerID" id="playerSelector" class="form-select" required>
+                        <option value="">-- Chọn cầu thủ --</option>
+                        @foreach (var p in players)
+                        {
+                            <option value="@p.PlayerId">@p.FullName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- SECTION 2: EVENT DETAILS -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <span>🎬</span>
+                    <span>Chi tiết sự kiện</span>
+                </h3>
+
+                <!-- EVENT TYPE -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>📌</span>
+                        <span>Loại sự kiện</span>
+                        <span class="required">*</span>
+                    </label>
+                    <select asp-for="EventType" class="form-select" required>
+                        <option value="">-- Chọn loại sự kiện --</option>
+                        @foreach (var t in eventTypes)
+                        {
+                            <option value="@t">@t</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- DATETIME -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>⏱</span>
+                        <span>Thời điểm</span>
+                        <span class="required">*</span>
+                    </label>
+                    <input asp-for="DateTime"
+                           type="datetime-local"
+                           class="form-input"
+                           value="@(Model.DateTime?.ToString("yyyy-MM-ddTHH:mm") ?? "")"
+                           required />
+                    <span class="input-hint">Thời gian chính xác khi sự kiện xảy ra</span>
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>📝</span>
+                        <span>Mô tả chi tiết</span>
+                    </label>
+                    <textarea asp-for="Description"
+                              class="form-textarea"
+                              placeholder="Nhập mô tả chi tiết về sự kiện (tùy chọn)..."
+                              rows="4"></textarea>
+                </div>
+            </div>
+
+            <!-- FORM ACTIONS -->
+            <div class="form-actions">
+                <a href="javascript:history.back()" class="btn-cancel">
+                    <span>✕</span>
+                    <span>Hủy bỏ</span>
+                </a>
+                <button type="submit" class="btn-submit">
+                    <span>💾</span>
+                    <span>Lưu sự kiện</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚽</div>
+        <div style="font-weight: 600; color: #059669;">Đang tải danh sách cầu thủ...</div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Match selector - load players
+    document.getElementById("matchSelector").addEventListener("change", function () {
+        var matchId = this.value;
+        if (!matchId) return;
+
+        // Show loading
+        document.getElementById("loadingOverlay").classList.add("active");
+
+        fetch(`/MatchEvents/GetPlayersByMatch?matchId=${matchId}`)
+            .then(res => res.json())
+            .then(players => {
+                let dropdown = document.getElementById("playerSelector");
+                dropdown.innerHTML = `<option value="">-- Chọn cầu thủ --</option>`;
+
+                players.forEach(p => {
+                    dropdown.innerHTML += `<option value="${p.playerId}">${p.fullName}</option>`;
+                });
+
+                // Hide loading
+                document.getElementById("loadingOverlay").classList.remove("active");
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi khi tải danh sách cầu thủ!');
+                document.getElementById("loadingOverlay").classList.remove("active");
+            });
+    });
+
+    // Form validation
+    document.getElementById("eventForm").addEventListener("submit", function(e) {
+        const matchId = document.getElementById("matchSelector").value;
+        const playerId = document.getElementById("playerSelector").value;
+        const eventType = document.querySelector('[name="EventType"]').value;
+        const dateTime = document.querySelector('[name="DateTime"]').value;
+
+        if (!matchId || !playerId || !eventType || !dateTime) {
+            e.preventDefault();
+            alert('Vui lòng điền đầy đủ các trường bắt buộc!');
+            return false;
+        }
+    });
+
+    // Auto-focus first input
+    window.addEventListener('load', function() {
+        document.getElementById('matchSelector').focus();
+    });
+</script>
+}

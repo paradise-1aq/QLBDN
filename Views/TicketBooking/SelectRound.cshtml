@@ -1,0 +1,344 @@
+@model IEnumerable<QLBDN.Models.Round>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Chọn vòng đấu";
+}
+
+<style>
+    .rounds-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        padding: 2rem 2.5rem;
+        border-radius: 20px;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 2px 12px rgba(52, 211, 153, 0.1);
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #065f46;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .page-subtitle {
+        font-size: 0.95rem;
+        color: #047857;
+        margin-top: 0.5rem;
+        font-weight: 500;
+    }
+
+    .rounds-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .round-card {
+        background: white;
+        padding: 1.75rem;
+        border-radius: 16px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 180px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .round-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #a7f3d0, #6ee7b7);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .round-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 24px rgba(52, 211, 153, 0.15);
+        border-color: #d1fae5;
+    }
+
+    .round-card:hover::before {
+        opacity: 1;
+    }
+
+    .round-icon {
+        background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        margin-bottom: 1.25rem;
+        color: #065f46;
+        font-size: 1.5rem;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(52, 211, 153, 0.2);
+        transition: all 0.3s;
+    }
+
+    .round-card:hover .round-icon {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 6px 16px rgba(52, 211, 153, 0.3);
+    }
+
+    .round-content {
+        flex: 1;
+    }
+
+    .round-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+
+    .round-description {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-bottom: 1.25rem;
+        line-height: 1.5;
+    }
+
+    .select-button {
+        margin-top: auto;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
+        color: #065f46;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(52, 211, 153, 0.15);
+        width: 100%;
+    }
+
+    .select-button:hover {
+        background: linear-gradient(135deg, #6ee7b7, #34d399);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 211, 153, 0.25);
+    }
+
+    .select-button:active {
+        transform: translateY(0);
+    }
+
+    .round-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: #f0fdf4;
+        color: #059669;
+        padding: 0.3rem 0.65rem;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border: 1px solid #d1fae5;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .round-card:hover .round-badge {
+        opacity: 1;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #94a3b8;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-text {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .stats-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #f1f5f9;
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    @@media (max-width: 768px) {
+        .rounds-container {
+            padding: 1rem 0.75rem;
+        }
+
+        .page-header {
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+        }
+
+        .rounds-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .round-card {
+            min-height: 160px;
+            padding: 1.5rem;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .page-title {
+            font-size: 1.3rem;
+        }
+
+        .round-icon {
+            width: 44px;
+            height: 44px;
+            font-size: 1.3rem;
+        }
+
+        .round-title {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+<section class="rounds-container">
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h2 class="page-title">
+            <span>🔄</span>
+            <span>Chọn vòng đấu</span>
+        </h2>
+        <p class="page-subtitle">
+            Chọn vòng đấu để xem danh sách các trận đấu và đặt vé
+        </p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon">🔄</div>
+            <div class="empty-text">Chưa có vòng đấu nào</div>
+        </div>
+    }
+    else
+    {
+        <div class="rounds-grid">
+            @foreach (var round in Model)
+            {
+                <div class="round-card">
+                    <!-- BADGE -->
+                    <div class="round-badge">
+                        Vòng đấu
+                    </div>
+
+                    <!-- ICON -->
+                    <div class="round-icon">
+                        ⚽
+                    </div>
+
+                    <!-- CONTENT -->
+                    <div class="round-content">
+                        <h3 class="round-title">
+                            @(round.TableName != null 
+                                ? round.RoundName + " " + round.TableName 
+                                : round.RoundName)
+                        </h3>
+
+                        <p class="round-description">
+                            Xem danh sách các trận đấu trong vòng này và chọn trận bạn muốn xem.
+                        </p>
+
+                        <!-- STATS INFO -->
+                        <div class="stats-info">
+                            <span>📊</span>
+                            <span>Nhấn để xem chi tiết</span>
+                        </div>
+                    </div>
+
+                    <!-- BUTTON -->
+                    <a href="/TicketBooking/SelectMatchByRound?roundId=@round.RoundId"
+                       class="select-button">
+                        <span>🎯</span>
+                        <span>Chọn vòng này</span>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<script>
+    // Add loading animation
+    window.addEventListener('load', function() {
+        const cards = document.querySelectorAll('.round-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+
+    // Add click animation
+    document.querySelectorAll('.select-button').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+
+    // Add card click navigation
+    document.querySelectorAll('.round-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Don't trigger if clicking the button
+            if (!e.target.closest('.select-button')) {
+                const link = this.querySelector('.select-button');
+                if (link) {
+                    window.location.href = link.href;
+                }
+            }
+        });
+    });
+</script>

@@ -1,0 +1,238 @@
+@model IEnumerable<QLBDN.Models.Match>
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    Layout = "~/Views/Shared/_layout.cshtml";
+    ViewData["Title"] = "Lịch thi đấu";
+
+    var totalMatches = Model?.Count() ?? 0;
+
+    // Danh sách mùa giải + mùa đang chọn (từ ViewBag)
+    var seasons = ViewBag.Seasons as List<SelectListItem> ?? new List<SelectListItem>();
+    int? selectedSeasonId = ViewBag.SelectedSeasonId != null
+        ? (int)ViewBag.SelectedSeasonId
+        : (int?)null;
+}
+
+<section style="margin-bottom: 1.5rem;">
+    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: .25rem;">
+        📅 Lịch thi đấu
+    </h2>
+    <p style="color: #64748b;">
+        Theo dõi danh sách các trận đấu trong giải.
+    </p>
+</section>
+
+<!-- Card thống kê -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+    <div style="background: #ffffff; border-radius: 18px; padding: 1.25rem 1.5rem; box-shadow: 0 1px 3px rgba(15,23,42,0.06); display:flex; align-items:center; gap:1rem;">
+        <div style="width:40px; height:40px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:rgba(59,130,246,0.10);">
+            📅
+        </div>
+        <div>
+            <div style="font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8;">Tổng trận đấu</div>
+            <div style="font-size:1.4rem; font-weight:700; color:#0f172a;">@totalMatches</div>
+        </div>
+    </div>
+
+    <div style="background:#ffffff; border-radius:18px; padding:1.25rem 1.5rem; box-shadow:0 1px 3px rgba(15,23,42,0.06); display:flex; align-items:center; gap:1rem;">
+        <div style="width:40px; height:40px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:rgba(16,185,129,0.10);">
+            ✅
+        </div>
+        <div>
+            <div style="font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8;">Trạng thái</div>
+            <div style="font-size:1.0rem; font-weight:600; color:#0f172a;">Đang cập nhật</div>
+        </div>
+    </div>
+</div>
+
+<!-- Bảng lịch thi đấu -->
+<div style="background:#ffffff; border-radius:20px; padding:1.5rem 1.75rem; box-shadow:0 1px 3px rgba(15,23,42,0.06);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <div>
+            <div style="font-weight:600; font-size:1.05rem; color:#0f172a;">Danh sách trận đấu</div>
+            <div style="font-size:.85rem; color:#94a3b8; margin-top:.15rem;">
+                Hiển thị câu lạc bộ, loại vòng đấu và kết quả trận đấu.
+            </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:.75rem;">
+            <!-- Chip chọn mùa giải -->
+            <form asp-action="Index" method="get"
+                  style="display:flex; align-items:center; gap:.4rem; background:#f1f5f9; border-radius:999px; padding:.25rem .75rem;">
+                <span style="font-size:.8rem; color:#64748b;">Mùa giải</span>
+                <select name="seasonId"
+                        onchange="this.form.submit()"
+                        style="border:none; background:transparent; font-size:.85rem; color:#0f172a; outline:none; cursor:pointer;">
+                    @foreach (var s in seasons)
+                    {
+                        bool isSelected = selectedSeasonId.HasValue &&
+                                          selectedSeasonId.Value.ToString() == s.Value;
+
+                        <option value="@s.Value" selected="@(isSelected ? "selected" : null)">
+                            @s.Text
+                        </option>
+                    }
+                </select>
+            </form>
+
+            <!-- Nút thêm trận đấu -->
+            <a asp-controller="Matches"
+            asp-action="Create"
+            style="
+                    border:none;
+                    border-radius:999px;
+                    padding:.55rem 1.1rem;
+                    font-size:.85rem;
+                    font-weight:600;
+                    background:linear-gradient(135deg,#10b981,#059669);
+                    color:white;
+                    cursor:pointer;
+                    text-decoration:none;
+                    box-shadow:0 3px 12px rgba(16,185,129,0.35);
+                    transition:all .25s;
+                    display:inline-flex;
+                    align-items:center;
+                    gap:.35rem;
+            "
+            onmouseover="this.style.transform='translateY(-2px)'"
+            onmouseout="this.style.transform='translateY(0)'">
+
+                <span style="font-size:1rem;">➕</span>
+                <span>Thêm trận đấu</span>
+            </a>
+
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            Chưa có trận đấu nào trong hệ thống.
+        </div>
+    }
+    else
+    {
+            <div style="overflow-x:auto;">
+        <table class="table" style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="background:#f8fafc; color:#64748b; font-size:.8rem; text-transform:uppercase; letter-spacing:.06em;">
+                    <th style="padding:.75rem .5rem; text-align:left;">#</th>
+                    <th style="padding:.75rem .5rem; text-align:left;">CLB 1</th>
+                    <th style="padding:.75rem .5rem; text-align:left;">CLB 2</th>
+                    <th style="padding:.75rem .5rem; text-align:left;">Kết quả</th>
+                    <th style="padding:.75rem .5rem; text-align:left;">Loại vòng</th>
+                    <th style="padding:.75rem .5rem; text-align:left;">Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            @{
+                var i = 1;
+            }
+            @foreach (var m in Model)
+            {
+                var orderedDetails = (m.MatchDetails ?? new List<QLBDN.Models.MatchDetail>())
+                    .OrderBy(d => d.IsHomeTeam == true ? 0 : 1)
+                    .ToList();
+
+                var club1 = orderedDetails.Count > 0
+                    ? (orderedDetails[0].Club?.Name ?? "N/A")
+                    : "N/A";
+
+                var club2 = orderedDetails.Count > 1
+                    ? (orderedDetails[1].Club?.Name ?? "N/A")
+                    : "N/A";
+
+                string score;
+                if (orderedDetails.Count >= 2)
+                {
+                    var g1 = orderedDetails[0].Goals ?? 0;
+                    var g2 = orderedDetails[1].Goals ?? 0;
+                    score = $"{g1} - {g2}";
+                }
+                else
+                {
+                    score = "Chưa thi đấu";
+                }
+
+                var roundName = m.Round != null ? m.Round.RoundName : $"Vòng {m.RoundId}";
+                if (m.Round != null && !string.IsNullOrEmpty(m.Round.TableName))
+                {
+                    roundName += $" - Bảng {m.Round.TableName}";
+                }
+
+                <tr style="border-top:1px solid #e2e8f0;">
+                    <td style="padding:.6rem .5rem;">@i</td>
+                    <td style="padding:.6rem .5rem; font-weight:500;">@club1</td>
+                    <td style="padding:.6rem .5rem; font-weight:500;">@club2</td>
+                    <td style="padding:.6rem .5rem;"><strong>@score</strong></td>
+                    <td style="padding:.6rem .5rem;">@roundName</td>
+
+                    <!-- 🔥 Nút xem chi tiết -->
+                    <td style="padding:.6rem .5rem; display:flex; gap:.4rem;">
+
+                    <!-- Nút Xem -->
+                    <a asp-action="Details"
+                    asp-route-id="@m.MatchId"
+                    style="
+                            padding:.45rem .9rem;
+                            border-radius:10px;
+                            background:linear-gradient(135deg,#10b981,#059669);
+                            color:white;
+                            font-size:.8rem;
+                            font-weight:600;
+                            text-decoration:none;
+                            box-shadow:0 2px 6px rgba(16,185,129,0.35);
+                            transition:.2s;">
+                        👁 Xem
+                    </a>
+
+                    <!-- Nút Sửa -->
+                    <a asp-action="Edit"
+                    asp-route-id="@m.MatchId"
+                    style="
+                            padding:.45rem .9rem;
+                            border-radius:10px;
+                            background:linear-gradient(135deg,#3b82f6,#2563eb);
+                            color:white;
+                            font-size:.8rem;
+                            font-weight:600;
+                            text-decoration:none;
+                            box-shadow:0 2px 6px rgba(59,130,246,0.35);
+                            transition:.2s;">
+                        ✏️ Sửa
+                    </a>
+
+                    <!-- Nút Xóa -->
+                    <form asp-action="Delete"
+                        asp-route-id="@m.MatchId"
+                        method="post"
+                        onsubmit="return confirm('Bạn có chắc muốn xoá trận đấu này không?');">
+                        <button style="
+                                padding:.45rem .9rem;
+                                border-radius:10px;
+                                background:#dc2626;
+                                color:white;
+                                font-size:.8rem;
+                                font-weight:600;
+                                border:none;
+                                cursor:pointer;
+                                box-shadow:0 2px 6px rgba(220,38,38,0.35);
+                                transition:.2s;">
+                            🗑 Xóa
+                        </button>
+                    </form>
+
+                </td>
+
+                </tr>
+
+                i++;
+            }
+            </tbody>
+        </table>
+    </div>
+
+    }
+</div>

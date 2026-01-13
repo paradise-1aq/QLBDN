@@ -1,0 +1,185 @@
+@model QLBDN.Models.News
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Xoá bài viết";
+}
+
+@section Styles {
+<style>
+    :root {
+        --primary: #10b981;
+        --primary-dark: #059669;
+        --danger: #dc2626;
+        --danger-light: #fee2e2;
+        --danger-dark: #b91c1c;
+        --text-dark: #0f172a;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+    }
+
+    .delete-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        animation: fadeUp .35s ease;
+    }
+
+    @@keyframes fadeUp {
+        from { opacity: 0; transform: translateY(10px);}
+        to { opacity: 1; transform: translateY(0);}
+    }
+
+    .delete-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 16px rgba(0,0,0,.05);
+    }
+
+    .delete-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--danger-dark);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .warning-box {
+        background: var(--danger-light);
+        border-left: 5px solid var(--danger);
+        padding: 1.2rem;
+        border-radius: 12px;
+        margin-bottom: 1.6rem;
+        color: var(--danger-dark);
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .info-row {
+        margin-bottom: 1rem;
+    }
+
+    .info-label {
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: .3rem;
+    }
+
+    .info-value {
+        color: var(--text-muted);
+    }
+
+    .article-preview {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        max-height: 160px;
+        overflow-y: auto;
+        font-size: .95rem;
+        color: var(--text-muted);
+    }
+
+    .delete-actions {
+        margin-top: 2rem;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-delete {
+        background: var(--danger);
+        padding: .85rem 1.6rem;
+        color: white;
+        font-weight: 700;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        transition: .25s ease;
+    }
+
+    .btn-delete:hover {
+        background: var(--danger-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(220,38,38,.3);
+    }
+
+    .btn-back {
+        padding: .85rem 1.4rem;
+        border-radius: 12px;
+        color: var(--text-muted);
+        text-decoration: none;
+        border: 2px solid var(--border);
+        font-weight: 600;
+        transition: .25s ease;
+    }
+
+    .btn-back:hover {
+        border-color: var(--primary);
+        background: #f1f5f9;
+        transform: translateY(-2px);
+    }
+</style>
+}
+
+<div class="delete-wrapper">
+    <div class="delete-card">
+
+        <!-- TIÊU ĐỀ -->
+        <div class="delete-title">🗑 Xác nhận xoá bài viết</div>
+
+        <!-- CẢNH BÁO -->
+        <div class="warning-box">
+            ⚠️ Hành động này không thể hoàn tác.<br />
+            Bạn có chắc chắn muốn xoá bài viết này cùng toàn bộ bình luận liên quan?
+        </div>
+
+        <!-- THÔNG TIN BÀI VIẾT -->
+        <div class="info-row">
+            <div class="info-label">Tiêu đề:</div>
+            <div class="info-value">@Model.Title</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Ngày đăng:</div>
+            <div class="info-value">@Model.PostedDate?.ToString("dd/MM/yyyy HH:mm")</div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Ảnh đại diện:</div>
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" style="max-width:200px;border-radius:10px;margin-top:5px;" />
+            }
+            else
+            {
+                <div class="info-value">Không có ảnh</div>
+            }
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Nội dung tóm tắt:</div>
+            <div class="article-preview">
+                @Html.Raw(Model.Content?.Length > 300 ? Model.Content.Substring(0,300) + "..." : Model.Content)
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="delete-actions">
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="NewsId" />
+                <button type="submit" class="btn-delete">🗑 Xoá bài viết</button>
+            </form>
+
+            <a asp-action="Index" class="btn-back">← Quay lại</a>
+        </div>
+
+    </div>
+</div>

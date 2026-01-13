@@ -1,0 +1,291 @@
+@model IEnumerable<QLBDN.Models.News>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Tin tức - QLBDN";
+}
+
+@functions {
+    public static string ToPlainText(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return "";
+        string text = System.Text.RegularExpressions.Regex.Replace(input, "<.*?>", " ");
+        return System.Net.WebUtility.HtmlDecode(text).Trim();
+    }
+}
+
+@section Styles {
+<style>
+    :root {
+        --primary: #10b981;
+        --primary-dark: #059669;
+        --primary-light: #34d399;
+        --text-dark: #0f172a;
+        --text-muted: #64748b;
+        --bg-light: #f1f5f9;
+    }
+
+    .news-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1.5rem;
+        animation: fadeIn .5s ease;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px);} 
+        to { opacity: 1; transform: translateY(0);} 
+    }
+
+    /* HEADER */
+    .news-header {
+        background: white;
+        padding: 2rem;
+        border-radius: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(0,0,0,.04);
+        margin-bottom: 2rem;
+    }
+
+    .header-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--primary-dark);
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+    }
+
+    .header-sub { 
+        margin-top: .3rem; 
+        color: var(--text-muted); 
+    }
+
+    .btn-add {
+        padding: .85rem 1.7rem;
+        background: linear-gradient(135deg, var(--primary-light), var(--primary));
+        color: white;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 6px 14px rgba(16,185,129,.35);
+        transition: .25s;
+    }
+
+    .btn-add:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    }
+
+    /* STATS BAR */
+    .stats-bar {
+        background: white;
+        border-radius: 16px;
+        padding: 1.2rem 1.6rem;
+        margin-bottom: 2rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 10px rgba(0,0,0,.03);
+        font-weight: 600;
+        color: var(--text-muted);
+        display: flex;
+        justify-content: space-between;
+    }
+
+    /* GRID */
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+        gap: 1.8rem;
+    }
+
+    /* CARD */
+    .news-card {
+        background: white;
+        border-radius: 18px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        transition: .25s ease;
+        position: relative;
+    }
+
+    .news-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 28px rgba(16,185,129,.25);
+        border-color: var(--primary-light);
+    }
+
+    /* IMAGE */
+    .news-img-wrapper {
+        height: 200px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        position: relative;
+    }
+
+    .news-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: .35s ease;
+    }
+
+    .news-card:hover .news-img {
+        transform: scale(1.08);
+    }
+
+    .news-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: var(--primary);
+        color: white;
+        padding: .4rem .8rem;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: .8rem;
+        box-shadow: 0 2px 10px rgba(16,185,129,.3);
+    }
+
+    /* CONTENT */
+    .news-body {
+        padding: 1.4rem 1.6rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .news-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        margin-bottom: .6rem;
+        color: var(--text-dark);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .news-summary {
+        font-size: .92rem;
+        color: var(--text-muted);
+        line-height: 1.55;
+        flex: 1;
+    }
+
+    /* META */
+    .news-meta {
+        padding: 1rem 1.6rem;
+        border-top: 1px solid #e2e8f0;
+        font-size: .85rem;
+        color: var(--text-muted);
+        display: flex;
+        justify-content: space-between;
+    }
+
+    /* ACTIONS */
+    .news-actions {
+        padding: 1rem 1.4rem;
+        border-top: 1px solid #e2e8f0;
+        background: #f8fafc;
+        display: flex;
+        gap: .6rem;
+    }
+
+    .btn-action {
+        flex: 1;
+        padding: .65rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: .85rem;
+        transition: .25s ease;
+        text-align: center;
+    }
+
+    .btn-view { background: #eef2f6; color:#475569; }
+    .btn-edit { background: var(--primary); color: white; }
+    .btn-delete { background: #fee2e2; color: #dc2626; }
+
+    .btn-view:hover { background: #e2e8f0; }
+    .btn-edit:hover { background: var(--primary-dark); }
+    .btn-delete:hover { background: #fecaca; }
+</style>
+}
+
+<div class="news-container">
+
+    <!-- HEADER -->
+    <div class="news-header">
+        <div>
+            <div class="header-title">📰 Tin tức & Bài viết</div>
+            <div class="header-sub">Cập nhật tin tức mới nhất về giải đấu</div>
+        </div>
+
+        <a asp-action="Create" class="btn-add">➕ Đăng bài mới</a>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+        <span>Tổng số bài viết:</span>
+        <strong>@Model.Count()</strong>
+    </div>
+
+    <!-- EMPTY -->
+    @if (!Model.Any())
+    {
+        <p style="text-align:center;padding:2rem;color:#64748b;">Chưa có bài viết nào.</p>
+    }
+    else
+    {
+        <div class="news-grid">
+            @foreach (var n in Model)
+            {
+                var plain = ToPlainText(n.Content);
+                var summary = plain.Length > 150 ? plain[..150] + "..." : plain;
+
+                <div class="news-card">
+
+                    <!-- IMAGE -->
+                    <div class="news-img-wrapper">
+                        @if (string.IsNullOrEmpty(n.ImageUrl))
+                        {
+                            <div style="display:flex;height:100%;justify-content:center;align-items:center;font-size:3rem;color:var(--primary);">📰</div>
+                        }
+                        else
+                        {
+                            <img src="@n.ImageUrl" class="news-img" />
+                        }
+
+                        <div class="news-badge">Mới</div>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="news-body">
+                        <div class="news-title">@n.Title</div>
+                        <div class="news-summary">@summary</div>
+                    </div>
+
+                    <!-- META -->
+                    <div class="news-meta">
+                        <span>✍️ @(n.User?.Username ?? "Không rõ tác giả")</span>
+                        <span>🕒 @n.PostedDate?.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="news-actions">
+                        <a asp-action="Details" asp-route-id="@n.NewsId" class="btn-action btn-view">👁 Xem</a>
+                        <a asp-action="Edit"    asp-route-id="@n.NewsId" class="btn-action btn-edit">✏️ Sửa</a>
+                        <a asp-action="Delete"  asp-route-id="@n.NewsId" class="btn-action btn-delete">🗑 Xóa</a>
+                    </div>
+
+                </div>
+            }
+        </div>
+    }
+</div>

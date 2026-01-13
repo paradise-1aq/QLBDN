@@ -1,0 +1,133 @@
+@model QLBDN.Models.MatchEvent
+@{
+    Layout = "~/Views/Shared/_layout.cshtml";
+    ViewData["Title"] = "Chi tiết sự kiện";
+
+    string icon = Model.EventType switch {
+        "Goal" => "⚽",
+        "Own Goal" => "🥅",
+        "Yellow Card" => "🟨",
+        "Red Card" => "🟥",
+        "Substitution" => "🔄",
+        "Penalty Goal" => "⚽",
+        "Penalty Miss" => "❌",
+        "VAR Review" => "📺",
+        _ => "📌"
+    };
+}
+
+@section Styles {
+<style>
+    .detail-card {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 18px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        border: 1px solid #e2e8f0;
+    }
+
+    .detail-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .detail-icon {
+        font-size: 4rem;
+        margin-bottom: .5rem;
+    }
+
+    .detail-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #059669;
+    }
+
+    .detail-row {
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    .detail-value {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .btn-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-main {
+        flex: 1;
+        padding: 0.85rem;
+        text-align: center;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-edit {
+        background: #10b981;
+        color: white;
+        box-shadow: 0 4px 12px rgba(16,185,129,.3);
+    }
+
+    .btn-delete {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .btn-back {
+        background: #f1f5f9;
+        color: #475569;
+    }
+</style>
+}
+
+<div class="detail-card fade-in">
+    <div class="detail-header">
+        <div class="detail-icon">@icon</div>
+        <div class="detail-title">@Model.EventType</div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-label">Cầu thủ</div>
+        <div class="detail-value">@Model.Player?.FullName</div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-label">Trận đấu</div>
+        <div class="detail-value">#@Model.MatchID</div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-label">Thời điểm</div>
+        <div class="detail-value">@Model.DateTime?.ToString("HH:mm • dd/MM/yyyy")</div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
+    {
+        <div class="detail-row">
+            <div class="detail-label">Mô tả</div>
+            <div class="detail-value">@Model.Description</div>
+        </div>
+    }
+
+    <div class="btn-actions">
+        <a class="btn-main btn-edit" asp-action="Edit" asp-route-id="@Model.EventID">✏️ Chỉnh sửa</a>
+        <a class="btn-main btn-delete" asp-action="Delete" asp-route-id="@Model.EventID">🗑 Xóa</a>
+        <a class="btn-main btn-back" asp-action="Index" asp-route-matchId="@Model.MatchID">⬅️ Quay lại</a>
+    </div>
+</div>

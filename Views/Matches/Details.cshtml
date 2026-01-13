@@ -1,0 +1,189 @@
+@model QLBDN.Models.Match
+@using System.Linq
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Chi tiết trận đấu";
+
+    // Lấy đội nhà / đội khách (có null-check cho chắc)
+    var home = Model.MatchDetails?
+        .FirstOrDefault((QLBDN.Models.MatchDetail md) => md.IsHomeTeam == true);
+
+    var away = Model.MatchDetails?
+        .FirstOrDefault((QLBDN.Models.MatchDetail md) => md.IsHomeTeam == false);
+}
+
+@section Styles {
+<style>
+    .match-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 1.5rem;
+        animation: fadeIn 0.35s ease;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .match-card {
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+
+    .match-title {
+        text-align: center;
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 1rem;
+    }
+
+    .match-clubs {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1.2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .club-name {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #059669;
+    }
+
+    .vs-icon {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #475569;
+    }
+
+    .info-box {
+        background: #f8fafc;
+        border-radius: 14px;
+        padding: 1.2rem 1.4rem;
+        border: 1px solid #e2e8f0;
+        margin-bottom: 2rem;
+        line-height: 1.75rem;
+        font-size: 0.98rem;
+        color: #334155;
+    }
+
+    .info-box strong {
+        color: #0f172a;
+    }
+
+    .score-box {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .score-label {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: .5rem;
+    }
+
+    .match-score {
+        font-size: 2.6rem;
+        font-weight: 800;
+        color: #059669;
+        letter-spacing: 2px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        justify-content: center;
+    }
+
+    .btn-action {
+        padding: 0.8rem 1.7rem;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .btn-back {
+        background: #e2e8f0;
+        color: #334155;
+    }
+    .btn-back:hover { background: #cbd5e1; }
+
+    .btn-edit {
+        background: #3b82f6;
+        color: #ffffff;
+    }
+    .btn-edit:hover { background: #2563eb; }
+
+    .btn-delete {
+        background: #ef4444;
+        color: #ffffff;
+    }
+    .btn-delete:hover { background: #dc2626; }
+</style>
+}
+
+<div class="match-container">
+    <div class="match-card">
+
+        <!-- TITLE -->
+        <h2 class="match-title">📄 Chi tiết trận đấu</h2>
+
+        <!-- CLUB NAMES -->
+        <div class="match-clubs">
+            <span class="club-name">@home?.Club?.Name  "Đội 1"</span>
+            <span class="vs-icon">VS</span>
+            <span class="club-name">@away?.Club?.Name  "Đội 2"</span>
+        </div>
+
+        <!-- MATCH INFO -->
+        <div class="info-box">
+            <strong>🕒 Thời gian:</strong>
+            @Model.DateTime?.ToString("dd/MM/yyyy HH:mm") <br>
+
+            <strong>📍 Sân vận động:</strong>
+            @Model.Stadium <br>
+
+            <strong>🏆 Vòng đấu:</strong>
+            @Model.Round?.RoundName
+            @if (!string.IsNullOrEmpty(Model.Round?.TableName))
+            {
+                <span>- Bảng @Model.Round.TableName</span>
+            }
+            <br>
+
+            <strong>📅 Mùa giải:</strong>
+            @Model.Season?.Name
+        </div>
+
+        <!-- SCORE -->
+        <div class="score-box">
+            <div class="score-label">🔢 Kết quả</div>
+            <div class="match-score">
+                @(home?.Goals ?? 0) - @(away?.Goals ?? 0)
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="actions">
+            <a asp-action="Index" class="btn-action btn-back">← Quay lại</a>
+            <a asp-action="Edit" asp-route-id="@Model.MatchId" class="btn-action btn-edit">✏️ Sửa</a>
+            <a asp-action="Delete" asp-route-id="@Model.MatchId" class="btn-action btn-delete">🗑 Xóa</a>
+        </div>
+
+    </div>
+</div>

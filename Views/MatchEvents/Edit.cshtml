@@ -1,0 +1,127 @@
+@model QLBDN.Models.MatchEvent
+@{
+    Layout = "~/Views/Shared/_layout.cshtml";
+    ViewData["Title"] = "Chỉnh sửa sự kiện";
+
+    var players = ViewBag.Players as List<QLBDN.Models.Player>;
+    var matches = ViewBag.Matches as List<QLBDN.Models.Match>;
+    var eventTypes = ViewBag.EventTypes as List<string>;
+}
+
+@section Styles {
+<style>
+    .edit-wrapper {
+        max-width: 850px;
+        margin: 0 auto;
+    }
+
+    .edit-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+        border: 1px solid #e2e8f0;
+    }
+
+    .form-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #059669;
+        margin-bottom: 1.5rem;
+    }
+
+    label {
+        font-weight: 700;
+        display: block;
+        color: #475569;
+        margin-bottom: 0.4rem;
+    }
+
+    select, input, textarea {
+        width: 100%;
+        border-radius: 12px;
+        padding: 0.8rem;
+        border: 2px solid #e2e8f0;
+        font-size: 1rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .btn-save {
+        background: #10b981;
+        color: white;
+        padding: 1rem;
+        font-weight: 800;
+        border-radius: 12px;
+        text-align: center;
+        width: 100%;
+        margin-top: 1rem;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-back {
+        display: block;
+        margin-top: 1rem;
+        color: #475569;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 600;
+    }
+</style>
+}
+
+<div class="edit-wrapper fade-in">
+    <div class="edit-card">
+        <div class="form-title">✏️ Chỉnh sửa sự kiện</div>
+
+        <form asp-action="Edit">
+
+            <input type="hidden" asp-for="EventID" />
+
+            <!-- Match -->
+            <label>Trận đấu</label>
+            <select asp-for="MatchID">
+                @foreach (var m in matches)
+                {
+                    <option value="@m.MatchId" selected="@(m.MatchId == Model.MatchID)">
+                        @($"#{m.MatchId} • {m.Stadium} • {m.DateTime:dd/MM HH:mm}")
+                    </option>
+                }
+            </select>
+
+            <!-- Player -->
+            <label>Cầu thủ</label>
+            <select asp-for="PlayerID">
+                @foreach (var p in players)
+                {
+                    <option value="@p.PlayerId" selected="@(p.PlayerId == Model.PlayerID)">
+                        @p.FullName
+                    </option>
+                }
+            </select>
+
+            <!-- Type -->
+            <label>Loại sự kiện</label>
+            <select asp-for="EventType">
+                @foreach (var e in eventTypes)
+                {
+                    <option value="@e" selected="@(Model.EventType == e)">@e</option>
+                }
+            </select>
+
+            <!-- Time -->
+            <label>Thời điểm</label>
+            <input asp-for="DateTime" type="datetime-local"
+                   value="@(Model.DateTime?.ToString("yyyy-MM-ddTHH:mm"))" />
+
+            <!-- Description -->
+            <label>Mô tả</label>
+            <textarea asp-for="Description" rows="4"></textarea>
+
+            <button class="btn-save">💾 Lưu thay đổi</button>
+
+            <a class="btn-back" asp-action="Index" asp-route-matchId="@Model.MatchID">← Quay lại</a>
+        </form>
+
+    </div>
+</div>

@@ -1,0 +1,478 @@
+@model QLBDN.Models.Player
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Thông tin cầu thủ";
+}
+
+<style>
+    .details-container {
+        padding: 2rem 1rem;
+        max-width: 1100px;
+        margin: auto;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        background: #f8fafc;
+        color: #64748b;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.25s;
+        border: 1px solid #e2e8f0;
+    }
+
+    .back-button:hover {
+        background: #f1f5f9;
+        color: #475569;
+        transform: translateX(-4px);
+    }
+
+    .page-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #34d399, #10b981);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .details-card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        border: 1px solid #f1f5f9;
+        display: flex;
+        gap: 2.5rem;
+        align-items: flex-start;
+    }
+
+    .avatar-section {
+        text-align: center;
+        min-width: 220px;
+    }
+
+    .avatar-wrapper {
+        width: 180px;
+        height: 180px;
+        margin: 0 auto 1.25rem;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid #e0f2fe;
+        box-shadow: 0 8px 24px rgba(52, 211, 153, 0.15);
+        transition: all 0.3s;
+        position: relative;
+    }
+
+    .avatar-wrapper:hover {
+        border-color: #a7f3d0;
+        box-shadow: 0 10px 30px rgba(52, 211, 153, 0.25);
+        transform: scale(1.05);
+    }
+
+    .avatar-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #6ee7b7, #34d399);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: white;
+    }
+
+    .player-name {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+    }
+
+    .club-name {
+        color: #047857;
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 1rem;
+        background: #ecfdf5;
+        color: #047857;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border: 1px solid #d1fae5;
+    }
+
+    .status-badge.injured {
+        background: #fef2f2;
+        color: #dc2626;
+        border-color: #fecaca;
+    }
+
+    .status-badge.suspended {
+        background: #fefce8;
+        color: #ca8a04;
+        border-color: #fef08a;
+    }
+
+    .status-badge.retired {
+        background: #f3f4f6;
+        color: #6b7280;
+        border-color: #e5e7eb;
+    }
+
+    .info-section {
+        flex: 1;
+    }
+
+    .section-header {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #047857;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #f0fdf4;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        background: #fafbfc;
+        padding: 1rem;
+        border-radius: 12px;
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s;
+    }
+
+    .info-item:hover {
+        background: #f8fafc;
+        border-color: #d1fae5;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 211, 153, 0.08);
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #64748b;
+        font-size: 0.85rem;
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .info-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid #f0fdf4;
+    }
+
+    .btn {
+        padding: 0.75rem 1.75rem;
+        font-weight: 700;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #6ee7b7, #34d399);
+        color: #065f46;
+        box-shadow: 0 2px 10px rgba(52, 211, 153, 0.25);
+    }
+
+    .btn-edit:hover {
+        background: linear-gradient(135deg, #34d399, #10b981);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(52, 211, 153, 0.35);
+    }
+
+    .btn-delete {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1.5px solid #fecaca;
+    }
+
+    .btn-delete:hover {
+        background: #fee2e2;
+        border-color: #fca5a5;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+    }
+
+    .stats-card {
+        background: linear-gradient(135deg, #f0fdf4, #d1fae5);
+        padding: 1.5rem;
+        border-radius: 16px;
+        margin-top: 2rem;
+        border: 1px solid #a7f3d0;
+    }
+
+    .stats-title {
+        font-weight: 700;
+        color: #047857;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stats-note {
+        font-size: 0.9rem;
+        color: #059669;
+        line-height: 1.6;
+    }
+
+    @@media (max-width: 768px) {
+        .details-card {
+            flex-direction: column;
+            padding: 1.5rem;
+            gap: 1.5rem;
+        }
+
+        .avatar-section {
+            width: 100%;
+            min-width: auto;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+
+<div class="details-container">
+    <!-- BACK BUTTON -->
+    <a href="/players" class="back-button">
+        <span>←</span>
+        <span>Quay lại danh sách</span>
+    </a>
+
+    <!-- TITLE -->
+    <h2 class="page-title">
+        <span>👤</span>
+        Thông tin cầu thủ
+    </h2>
+
+    <!-- MAIN CARD -->
+    <div class="details-card">
+        <!-- AVATAR SECTION -->
+        <div class="avatar-section">
+            <div class="avatar-wrapper">
+                @if (!string.IsNullOrEmpty(Model.AvatarUrl))
+                {
+                    <img src="@Model.AvatarUrl" alt="@Model.FullName" />
+                }
+                else
+                {
+                    <div class="avatar-placeholder">
+                        ⚽
+                    </div>
+                }
+            </div>
+
+            <h3 class="player-name">@Model.FullName</h3>
+
+            <div class="club-name">
+                <span>🏆</span>
+                @if (Model.Club != null)
+                {
+                    <span>@Model.Club.Name</span>
+                }
+                else
+                {
+                    <span>Không có CLB</span>
+                }
+            </div>
+
+            @{
+                var statusClass = "status-badge";
+                var statusIcon = "⚡";
+                
+                if (!string.IsNullOrEmpty(Model.Status))
+                {
+                    if (Model.Status.Contains("Chấn thương"))
+                    {
+                        statusClass += " injured";
+                        statusIcon = "🩹";
+                    }
+                    else if (Model.Status.Contains("Treo giò"))
+                    {
+                        statusClass += " suspended";
+                        statusIcon = "🟨";
+                    }
+                    else if (Model.Status.Contains("Giải nghệ"))
+                    {
+                        statusClass += " retired";
+                        statusIcon = "👋";
+                    }
+                }
+            }
+
+            <div class="@statusClass">
+                <span>@statusIcon</span>
+                <span>@(string.IsNullOrEmpty(Model.Status) ? "Không có dữ liệu" : Model.Status)</span>
+            </div>
+        </div>
+
+        <!-- INFO SECTION -->
+        <div class="info-section">
+            <div class="section-header">
+                <span>📋</span>
+                <span>Thông tin chi tiết</span>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">
+                        <span>⚽</span>
+                        <span>Vị trí</span>
+                    </div>
+                    <div class="info-value">
+                        @(Model.Role?.RoleName ?? "Chưa xác định")
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">
+                        <span>👕</span>
+                        <span>Số áo</span>
+                    </div>
+                    <div class="info-value">
+                        #@Model.ShirtNumber
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">
+                        <span>🎂</span>
+                        <span>Ngày sinh</span>
+                    </div>
+                    <div class="info-value">
+                        @(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Không rõ")
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">
+                        <span>🌍</span>
+                        <span>Quốc tịch</span>
+                    </div>
+                    <div class="info-value">
+                        @(Model.Nationality ?? "Không rõ")
+                    </div>
+                </div>
+            </div>
+
+            <!-- STATS CARD -->
+            <div class="stats-card">
+                <div class="stats-title">
+                    <span>📊</span>
+                    <span>Thông tin bổ sung</span>
+                </div>
+                <div class="stats-note">
+                    ✓ Cầu thủ đang thi đấu cho <strong>@(Model.Club?.Name ?? "Chưa có CLB")</strong><br/>
+                    ✓ Vị trí chính: <strong>@(Model.Role?.RoleName ?? "Chưa xác định")</strong><br/>
+                    @if (Model.DateOfBirth.HasValue)
+                    {
+                        var age = DateTime.Now.Year - Model.DateOfBirth.Value.Year;
+                        <text>✓ Tuổi hiện tại: <strong>@age tuổi</strong></text>
+                    }
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="action-buttons">
+                <a href="/players/@Model.PlayerId/edit" class="btn btn-edit">
+                    <span>✏️</span>
+                    <span>Chỉnh sửa</span>
+                </a>
+
+                <form method="post" action="/players/delete/@Model.PlayerId" 
+                      onsubmit="return confirm('⚠️ Bạn có chắc chắn muốn xóa cầu thủ này?\n\nThao tác này không thể hoàn tác!')"
+                      style="margin: 0;">
+                    <button type="submit" class="btn btn-delete">
+                        <span>🗑️</span>
+                        <span>Xóa cầu thủ</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add smooth scroll to top
+    document.querySelector('.back-button')?.addEventListener('click', function(e) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Add confirmation animation
+    document.querySelector('form[onsubmit]')?.addEventListener('submit', function(e) {
+        const confirmed = confirm('⚠️ Bạn có chắc chắn muốn xóa cầu thủ này?\n\nThao tác này không thể hoàn tác!');
+        if (!confirmed) {
+            e.preventDefault();
+        }
+    });
+</script>

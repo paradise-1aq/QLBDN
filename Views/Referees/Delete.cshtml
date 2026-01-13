@@ -1,0 +1,66 @@
+@model QLBDN.Models.Referee
+@{
+    Layout = "~/Views/Shared/_layout.cshtml";
+    ViewData["Title"] = "Xóa trọng tài";
+}
+
+@section Styles {
+<style>
+    .delete-card {
+        max-width: 650px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 18px;
+        border: 1px solid #fecaca;
+        box-shadow: 0 4px 14px rgba(220,38,38,0.18);
+        animation: fadeIn .4s ease;
+    }
+
+    .warning-text {
+        color: #dc2626;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn-danger {
+        background: #dc2626;
+        color: white;
+        padding: .75rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .25s;
+    }
+    .btn-danger:hover {
+        background: #b91c1c;
+        transform: translateY(-2px);
+    }
+
+    .btn-cancel {
+        margin-left: 1rem;
+        padding: .75rem 1.5rem;
+        border-radius: 12px;
+        background: #f1f5f9;
+        text-decoration:none;
+        color:#475569;
+        font-weight:600;
+    }
+</style>
+}
+
+<div class="delete-card">
+    <h2 class="warning-text">⚠️ Bạn có chắc chắn muốn xóa trọng tài này?</h2>
+
+    <p><strong>@Model.FullName</strong></p>
+    <p>Cấp độ: <strong>@Model.Level</strong></p>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="RefereeId" />
+
+        <button type="submit" class="btn-danger">🗑 Xóa</button>
+        <a asp-action="Index" class="btn-cancel">Hủy</a>
+    </form>
+</div>

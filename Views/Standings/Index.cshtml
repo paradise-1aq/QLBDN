@@ -1,0 +1,415 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model IEnumerable<QLBDN.Models.StandingsRowViewModel>
+@using QLBDN.Models
+@using System.Linq
+
+@{
+    ViewData["Title"] = "Bảng xếp hạng";
+
+    var season  = ViewData["Season"] as Season;
+    var seasons = ViewData["Seasons"] as IEnumerable<Season>;
+
+    var rows = Model?.ToList() ?? new List<StandingsRowViewModel>();
+
+    int totalClubs   = rows.Count;
+    int totalGoals   = rows.Sum(x => x.GoalsFor);
+    int totalMatches = rows.Sum(x => x.Played) / 2; // mỗi trận tính cho 2 đội
+}
+
+@section Styles {
+    <style>
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+        .page-header-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+        .page-header-title-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: linear-gradient(135deg,#34d399,#10b981);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(16,185,129,.5);
+            font-size: 1.2rem;
+        }
+        .page-header-sub {
+            margin-top: .25rem;
+            font-size: .9rem;
+            color: #64748b;
+        }
+
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0 1.25rem;
+            flex-wrap: wrap;
+        }
+        .season-select-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .4rem .75rem;
+            border-radius: 999px;
+            background: #f1f5f9;
+        }
+        .season-select-wrap label {
+            font-size: .85rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .season-select-wrap select {
+            padding: .3rem .75rem;
+            border-radius: 999px;
+            border: 1px solid #cbd5e1;
+            font-size: .85rem;
+            outline: none;
+            background: #fff;
+        }
+        .season-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            padding: .35rem .8rem;
+            border-radius: 999px;
+            background: rgba(59,130,246,.08);
+            color: #1d4ed8;
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0,1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: .9rem 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(15,23,42,.06);
+        }
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ecfdf5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        .stat-card:nth-child(2) .stat-icon { background: #eff6ff; }
+        .stat-card:nth-child(3) .stat-icon { background: #fef9c3; }
+
+        .stat-label {
+            font-size: .8rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: .15rem;
+        }
+        .stat-sub {
+            font-size: .8rem;
+            color: #94a3b8;
+        }
+
+        .bxh-card {
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(15,23,42,.05);
+            overflow: hidden;
+        }
+        .bxh-header {
+            padding: .85rem 1.25rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: .75rem;
+            background: #f8fafc;
+        }
+        .bxh-header-title {
+            font-size: .95rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .bxh-header-sub {
+            font-size: .8rem;
+            color: #64748b;
+        }
+        .bxh-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            font-size: .78rem;
+            color: #64748b;
+        }
+        .bxh-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: .25rem;
+        }
+        .bxh-legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+        }
+        .dot-top { background: #22c55e; }
+        .dot-bottom { background: #ef4444; }
+
+        .bxh-table-wrapper {
+            overflow-x: auto;
+        }
+        table.bxh-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .9rem;
+        }
+        .bxh-table thead {
+            background: #f9fafb;
+        }
+        .bxh-table th,
+        .bxh-table td {
+            padding: .55rem .85rem;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+            text-align: center;
+        }
+        .bxh-table th {
+            font-size: .78rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+        .bxh-table td.club-col {
+            text-align: left;
+            font-weight: 500;
+            color: #0f172a;
+        }
+        .bxh-table tr:nth-child(even) td {
+            background: #f9fafb;
+        }
+        .bxh-table tr:hover td {
+            background: #eff6ff;
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            font-size: .8rem;
+            font-weight: 700;
+        }
+        .rank-1 { background: #fef3c7; color: #92400e; }
+        .rank-2 { background: #e0f2fe; color: #075985; }
+        .rank-3 { background: #fce7f3; color: #9d174d; }
+        .rank-normal { background: #e5e7eb; color: #4b5563; }
+
+        .points-chip {
+            display: inline-block;
+            min-width: 44px;
+            padding: .1rem .5rem;
+            border-radius: 999px;
+            font-size: .8rem;
+            font-weight: 600;
+        }
+        .points-high { background: #dcfce7; color: #166534; }
+        .points-mid { background: #eff6ff; color: #1d4ed8; }
+        .points-low { background: #fee2e2; color: #b91c1c; }
+
+        .club-tag-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: .05rem .4rem;
+            margin-left: .3rem;
+            border-radius: 999px;
+            font-size: .7rem;
+            font-weight: 600;
+        }
+        .club-tag-top { background: #dcfce7; color: #15803d; }
+        .club-tag-bottom { background: #fee2e2; color: #b91c1c; }
+    </style>
+}
+
+<div class="page-header">
+    <div class="page-header-title">
+        <span class="page-header-title-icon">🏅</span>
+        <span>Bảng xếp hạng</span>
+    </div>
+    <div class="page-header-sub">
+        Theo dõi thứ hạng và thành tích của các câu lạc bộ trong mùa giải.
+    </div>
+</div>
+
+<div class="filter-bar">
+    <div class="season-select-wrap">
+        <label for="seasonId">Mùa giải</label>
+        <form method="get" action="/standings">
+            <select id="seasonId" name="seasonId" onchange="this.form.submit()">
+                @if (seasons != null)
+                {
+                    foreach (var s in seasons)
+                    {
+                        var selected = (season != null && s.SeasonId == season.SeasonId)
+                            ? "selected"
+                            : null;
+                        <option value="@s.SeasonId" selected="@selected">@s.Name</option>
+                    }
+                }
+            </select>
+            <noscript>
+                <button type="submit">Xem</button>
+            </noscript>
+        </form>
+    </div>
+
+    @if (season != null)
+    {
+        <div class="season-badge">
+            📅 Mùa hiện tại: <strong>@season.Name</strong>
+        </div>
+    }
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div>
+            <div class="stat-label">Câu lạc bộ</div>
+            <div class="stat-value">@totalClubs</div>
+            <div class="stat-sub">Đang tham gia mùa giải</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">⚽</div>
+        <div>
+            <div class="stat-label">Tổng bàn thắng</div>
+            <div class="stat-value">@totalGoals</div>
+            <div class="stat-sub">Bàn thắng của tất cả đội</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div>
+            <div class="stat-label">Trận đã đấu</div>
+            <div class="stat-value">@totalMatches</div>
+            <div class="stat-sub">Trận đã có kết quả</div>
+        </div>
+    </div>
+</div>
+
+<div class="bxh-card">
+    <div class="bxh-header">
+        <div>
+            <div class="bxh-header-title">Bảng xếp hạng chi tiết</div>
+            <div class="bxh-header-sub">
+                Xếp hạng theo: Điểm &gt; Hiệu số &gt; Bàn thắng &gt; Tên câu lạc bộ.
+            </div>
+        </div>
+        <div class="bxh-legend">
+            <div class="bxh-legend-item">
+                <span class="bxh-legend-dot dot-top"></span> Top đầu bảng
+            </div>
+            <div class="bxh-legend-item">
+                <span class="bxh-legend-dot dot-bottom"></span> Nhóm cuối bảng
+            </div>
+        </div>
+    </div>
+
+    <div class="bxh-table-wrapper">
+        <table class="bxh-table">
+            <thead>
+                <tr>
+                    <th>Hạng</th>
+                    <th>Câu lạc bộ</th>
+                    <th>Trận</th>
+                    <th>Thắng</th>
+                    <th>Hòa</th>
+                    <th>Thua</th>
+                    <th>BT</th>
+                    <th>BB</th>
+                    <th>HS</th>
+                    <th>Điểm</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var row in rows)
+            {
+                string rankClass = "rank-badge rank-normal";
+                if (row.Rank == 1) rankClass = "rank-badge rank-1";
+                else if (row.Rank == 2) rankClass = "rank-badge rank-2";
+                else if (row.Rank == 3) rankClass = "rank-badge rank-3";
+
+                string clubTagClass = "";
+                string clubTagText  = "";
+                if (row.Rank <= 3)
+                {
+                    clubTagClass = "club-tag-label club-tag-top";
+                    clubTagText  = "Top";
+                }
+                else if (totalClubs > 0 && row.Rank >= totalClubs - 1)
+                {
+                    clubTagClass = "club-tag-label club-tag-bottom";
+                    clubTagText  = "Cuối bảng";
+                }
+
+                string pointsClass = "points-chip points-mid";
+                if (row.Rank <= 3) pointsClass = "points-chip points-high";
+                else if (totalClubs > 0 && row.Rank >= totalClubs - 1) pointsClass = "points-chip points-low";
+
+                <tr>
+                    <td>
+                        <span class="@rankClass">@row.Rank</span>
+                    </td>
+                    <td class="club-col">
+                        @row.ClubName
+                        @if (!string.IsNullOrEmpty(clubTagClass))
+                        {
+                            <span class="@clubTagClass">@clubTagText</span>
+                        }
+                    </td>
+                    <td>@row.Played</td>
+                    <td>@row.Won</td>
+                    <td>@row.Drawn</td>
+                    <td>@row.Lost</td>
+                    <td>@row.GoalsFor</td>
+                    <td>@row.GoalsAgainst</td>
+                    <td>@row.GoalDifference</td>
+                    <td>
+                        <span class="@pointsClass">@row.Points</span>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

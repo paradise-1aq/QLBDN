@@ -1,0 +1,150 @@
+@model QLBDN.Models.Match
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Cập nhật trận đấu";
+
+    var home = Model.MatchDetails?.FirstOrDefault(md => md.IsHomeTeam == true);
+    var away = Model.MatchDetails?.FirstOrDefault(md => md.IsHomeTeam == false);
+
+    var clubs = ViewBag.Clubs as List<QLBDN.Models.Club>;
+    var rounds = ViewBag.Rounds as List<QLBDN.Models.Round>;
+    var seasons = ViewBag.Seasons as List<QLBDN.Models.Season>;
+}
+
+@section Styles {
+<style>
+    .edit-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+    .card {
+        background:white;
+        padding:2rem;
+        border-radius:18px;
+        box-shadow:0 3px 10px rgba(0,0,0,0.07);
+    }
+    .section-title {
+        font-size:1.2rem;
+        font-weight:700;
+        margin-bottom:1rem;
+        color:#059669;
+    }
+    label { font-weight:600; margin-bottom:.35rem; display:block; }
+    .form-control {
+        width:100%;
+        padding:.7rem 1rem;
+        border-radius:10px;
+        border:1px solid #d1d5db;
+        margin-bottom:1rem;
+    }
+    .btn-main {
+        padding:.8rem 1.3rem;
+        background:linear-gradient(135deg,#10b981,#059669);
+        color:white;
+        border:none;
+        border-radius:10px;
+        font-weight:600;
+        cursor:pointer;
+        box-shadow:0 3px 12px rgba(16,185,129,0.35);
+    }
+    .btn-main:hover { transform:translateY(-2px); }
+    .btn-cancel {
+        padding:.8rem 1.3rem;
+        background:#e5e7eb;
+        border-radius:10px;
+        text-decoration:none;
+        font-weight:600;
+        color:#374151;
+    }
+</style>
+}
+
+<div class="edit-container">
+
+    <a asp-action="Index" style="text-decoration:none; color:#059669; font-weight:600;">
+        ← Quay lại danh sách
+    </a>
+
+    <div class="card">
+        <h2 class="section-title">⚽ Chỉnh sửa trận đấu</h2>
+
+        <form asp-action="Edit" method="post">
+            <input type="hidden" name="id" value="@Model.MatchId" />
+
+            <!-- CLB -->
+            <label>Đội chủ nhà</label>
+            <select name="homeClubId" class="form-control">
+                @foreach (var c in clubs)
+                {
+                    <option value="@c.ClubId" selected="@(c.ClubId == home?.ClubId)">
+                        @c.Name
+                    </option>
+                }
+            </select>
+
+            <label>Đội khách</label>
+            <select name="awayClubId" class="form-control">
+                @foreach (var c in clubs)
+                {
+                    <option value="@c.ClubId" selected="@(c.ClubId == away?.ClubId)">
+                        @c.Name
+                    </option>
+                }
+            </select>
+
+            <!-- MÙA GIẢI -->
+            <label>Mùa giải</label>
+            <select name="seasonId" class="form-control">
+                @foreach (var s in seasons)
+                {
+                    <option value="@s.SeasonId" selected="@(s.SeasonId == Model.SeasonId)">
+                        @s.Name
+                    </option>
+                }
+            </select>
+
+            <!-- VÒNG ĐẤU -->
+            <label>Vòng đấu</label>
+            <select name="roundId" class="form-control">
+                @foreach (var r in rounds)
+                {
+                    <option value="@r.RoundId" selected="@(r.RoundId == Model.RoundId)">
+                        @r.RoundName @(string.IsNullOrEmpty(r.TableName) ? "" : $" - Bảng {r.TableName}")
+                    </option>
+                }
+            </select>
+
+            <!-- NGÀY GIỜ -->
+            <label>Ngày giờ</label>
+            <input type="datetime-local" name="dateTime"
+                   value="@Model.DateTime?.ToString("yyyy-MM-ddTHH:mm")"
+                   class="form-control" />
+
+            <!-- SÂN -->
+            <label>Sân vận động</label>
+            <input type="text" name="stadium" value="@Model.Stadium" class="form-control" />
+
+            <h3 class="section-title" style="margin-top:2rem;">🔢 Cập nhật tỷ số</h3>
+
+            <div style="display:flex; gap:1rem;">
+                <div style="flex:1;">
+                    <label>@home?.Club?.Name</label>
+                    <input type="number" min="0" name="homeGoals" value="@home?.Goals" class="form-control" />
+                </div>
+
+                <div style="flex:1;">
+                    <label>@away?.Club?.Name</label>
+                    <input type="number" min="0" name="awayGoals" value="@away?.Goals" class="form-control" />
+                </div>
+            </div>
+
+            <div style="margin-top:2rem; display:flex; gap:1rem;">
+                <button class="btn-main" type="submit">💾 Lưu thay đổi</button>
+                <a asp-action="Index" class="btn-cancel">Hủy</a>
+            </div>
+
+        </form>
+    </div>
+
+</div>

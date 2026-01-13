@@ -1,0 +1,501 @@
+@model QLBDN.Models.Referee
+
+@{
+    Layout = "~/Views/Shared/_layout.cshtml";
+    ViewData["Title"] = "Chi tiết trọng tài";
+}
+
+@section Styles {
+<style>
+    .details-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    /* ---------------- BACK LINK ---------------- */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #059669;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s;
+    }
+
+    .back-link:hover {
+        color: #047857;
+        transform: translateX(-3px);
+    }
+
+    /* ---------------- HEADER CARD ---------------- */
+    .header-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        border: 1px solid #f1f5f9;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .avatar-container {
+        flex-shrink: 0;
+    }
+
+    .avatar-lg {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #34d399, #10b981);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 800;
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+        transition: all 0.3s;
+    }
+
+    .avatar-lg:hover {
+        transform: scale(1.05) rotate(5deg);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+    }
+
+    .header-info {
+        flex: 1;
+    }
+
+    .referee-name {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #059669;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .referee-subtitle {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        color: #047857;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-top: 1rem;
+    }
+
+    /* ---------------- INFO GRID ---------------- */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-box {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s;
+    }
+
+    .info-box:hover {
+        background: white;
+        border-color: #6ee7b7;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+    }
+
+    .info-box-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .info-label {
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-value {
+        color: #0f172a;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    /* ---------------- MATCHES SECTION ---------------- */
+    .matches-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        border: 1px solid #f1f5f9;
+        animation: fadeIn 0.6s ease;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .match-count {
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+        padding: 0.4rem 0.9rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .matches-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .match-item {
+        background: white;
+        padding: 1.25rem 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s;
+        gap: 1rem;
+    }
+
+    .match-item:hover {
+        border-color: #6ee7b7;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .match-info {
+        flex: 1;
+    }
+
+    .match-id {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+    }
+
+    .match-role {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        background: #ecfdf5;
+        color: #047857;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .match-time {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    .match-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.25rem;
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+        white-space: nowrap;
+    }
+
+    .match-action:hover {
+        background: linear-gradient(135deg, #10b981, #059669);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px dashed #cbd5e1;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.4;
+    }
+
+    .empty-text {
+        color: #64748b;
+        font-size: 1rem;
+    }
+
+    /* ---------------- ACTIONS ---------------- */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: #e2e8f0;
+        color: #334155;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-back:hover {
+        background: #cbd5e1;
+        color: #1e293b;
+    }
+
+    /* ---------------- ANIMATIONS ---------------- */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ---------------- RESPONSIVE ---------------- */
+    @@media (max-width: 768px) {
+        .details-container {
+            padding: 0 0.75rem;
+        }
+
+        .header-card {
+            padding: 1.5rem;
+        }
+
+        .header-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 1.5rem;
+        }
+
+        .referee-name {
+            font-size: 1.6rem;
+            justify-content: center;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .matches-card {
+            padding: 1.5rem;
+        }
+
+        .section-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .match-item {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .match-action {
+            justify-content: center;
+        }
+    }
+</style>
+}
+
+<div class="details-container">
+    <a asp-action="Index" class="back-link">
+        <span>←</span>
+        <span>Quay lại danh sách</span>
+    </a>
+
+    <!-- HEADER CARD -->
+    <div class="header-card">
+        <div class="header-content">
+            <div class="avatar-container">
+                @{
+                    var initials = Model.FullName?.Split(' ').Last().Substring(0, 1).ToUpper() ?? "R";
+                }
+                <div class="avatar-lg">@initials</div>
+            </div>
+
+            <div class="header-info">
+                <h2 class="referee-name">
+                    <span>👨‍⚖️</span>
+                    <span>@Model.FullName</span>
+                </h2>
+                <p class="referee-subtitle">
+                    Thông tin chi tiết về trọng tài
+                </p>
+                <div class="status-badge">
+                    <span>✓</span>
+                    <span>Trọng tài chính thức</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- INFO GRID -->
+        <div class="info-grid">
+            <div class="info-box">
+                <div class="info-box-header">
+                    <div class="info-icon">🎖️</div>
+                    <div class="info-label">Cấp độ</div>
+                </div>
+                <div class="info-value">@(Model.Level ?? "Chưa xác định")</div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-header">
+                    <div class="info-icon">🎂</div>
+                    <div class="info-label">Ngày sinh</div>
+                </div>
+                <div class="info-value">
+                    @(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-header">
+                    <div class="info-icon">📊</div>
+                    <div class="info-label">Kinh nghiệm</div>
+                </div>
+                <div class="info-value">@(Model.Experience ?? 0) năm</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MATCHES CARD -->
+    <div class="matches-card">
+        <div class="section-header">
+            <h3 class="section-title">
+                <span>📅</span>
+                <span>Trận đã tham gia</span>
+            </h3>
+            @if (Model.RefereeMatches != null && Model.RefereeMatches.Any())
+            {
+                <div class="match-count">
+                    @Model.RefereeMatches.Count() trận
+                </div>
+            }
+        </div>
+
+        @if (Model.RefereeMatches == null || !Model.RefereeMatches.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📅</div>
+                <div class="empty-text">Chưa tham gia trận nào</div>
+            </div>
+        }
+        else
+        {
+            <div class="matches-list">
+                @foreach (var m in Model.RefereeMatches)
+                {
+                    <div class="match-item">
+                        <div class="match-info">
+                            <div class="match-id">
+                                🏆 Trận đấu #@m.Match.MatchId
+                            </div>
+                            <div class="match-role">
+                                @(m.Role ?? "Vai trò không xác định")
+                            </div>
+                            <div class="match-time">
+                                <span>📅</span>
+                                <span>@m.Match.DateTime?.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                        </div>
+
+                        <a asp-controller="Matches" 
+                           asp-action="Details" 
+                           asp-route-id="@m.MatchId"
+                           class="match-action">
+                            <span>Xem chi tiết</span>
+                            <span>→</span>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- ACTION BUTTONS -->
+        <div class="action-buttons">
+            <a asp-action="Index" class="btn-back">
+                <span>←</span>
+                <span>Quay lại</span>
+            </a>
+        </div>
+    </div>
+</div>

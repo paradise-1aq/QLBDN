@@ -1,0 +1,371 @@
+@model IEnumerable<dynamic>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Các trận đấu trong vòng";
+
+    // GOM THEO NĂM
+    var yearGroups = Model
+        .GroupBy(m => m.Match.DateTime?.Year)
+        .OrderBy(g => g.Key)
+        .ToList();
+}
+
+<style>
+    .matches-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        padding: 2rem 2.5rem;
+        border-radius: 20px;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 2px 12px rgba(52, 211, 153, 0.1);
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #065f46;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .page-subtitle {
+        font-size: 0.95rem;
+        color: #047857;
+        margin-top: 0.5rem;
+        font-weight: 500;
+    }
+
+    .year-section {
+        margin-bottom: 3rem;
+    }
+
+    .year-header {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #047857;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #d1fae5;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .matches-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .match-card {
+        background: white;
+        padding: 1.75rem;
+        padding-top: 2.5rem;
+        border-radius: 16px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .match-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #a7f3d0, #6ee7b7);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .match-card:hover {
+        border-color: #d1fae5;
+        box-shadow: 0 8px 24px rgba(52, 211, 153, 0.15);
+        transform: translateY(-4px);
+    }
+
+    .match-card:hover::before {
+        opacity: 1;
+    }
+
+    .teams-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .team-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f172a;
+        flex: 1;
+        text-align: center;
+    }
+
+    .vs-divider {
+        color: #94a3b8;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .match-info {
+        background: #fafbfc;
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 1.25rem;
+        border: 1px solid #f1f5f9;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-icon {
+        font-size: 1rem;
+    }
+
+    .info-text {
+        font-weight: 500;
+    }
+
+    .buy-ticket-btn {
+        display: block;
+        width: 100%;
+        padding: 0.875rem 1.5rem;
+        background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
+        color: #065f46;
+        text-align: center;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(52, 211, 153, 0.15);
+        border: none;
+        cursor: pointer;
+    }
+
+    .buy-ticket-btn:hover {
+        background: linear-gradient(135deg, #6ee7b7, #34d399);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(52, 211, 153, 0.25);
+    }
+
+    .buy-ticket-btn:active {
+        transform: translateY(0);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #94a3b8;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-text {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .match-badge {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        background: #f0fdf4;
+        color: #059669;
+        padding: 0.3rem 0.65rem;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border: 1px solid #d1fae5;
+        opacity: 0.8;
+    }
+
+    @@media (max-width: 768px) {
+        .matches-container {
+            padding: 1rem 0.75rem;
+        }
+
+        .page-header {
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+        }
+
+        .matches-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .match-card {
+            padding: 1.25rem;
+        }
+
+        .team-name {
+            font-size: 1rem;
+        }
+
+        .year-header {
+            font-size: 1.3rem;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .teams-row {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .vs-divider {
+            transform: rotate(90deg);
+            margin: 0.25rem 0;
+        }
+    }
+</style>
+
+<section class="matches-container">
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h2 class="page-title">
+            <span>⚽</span>
+            <span>Các trận đấu trong vòng</span>
+        </h2>
+        <p class="page-subtitle">
+            Chọn trận đấu và đặt vé ngay để không bỏ lỡ những trận cầu hấp dẫn
+        </p>
+    </div>
+
+    @if (!yearGroups.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon">📅</div>
+            <div class="empty-text">Chưa có trận đấu nào trong vòng này</div>
+        </div>
+    }
+    else
+    {
+        @foreach (var yearGroup in yearGroups)
+        {
+            var year = yearGroup.Key;
+            var matches = yearGroup.ToList();
+
+            <div class="year-section">
+                <!-- TIÊU ĐỀ NĂM -->
+                <h3 class="year-header">
+                    <span>📅</span>
+                    <span>Năm @year</span>
+                    <span style="font-size: 0.9rem; color: #6b7280; font-weight: 500;">
+                        (@matches.Count trận)
+                    </span>
+                </h3>
+
+                <div class="matches-grid">
+                    @foreach (var match in matches)
+                    {
+                        <div class="match-card">
+                            <!-- MATCH BADGE -->
+                            <div class="match-badge">
+                                Vòng đấu
+                            </div>
+
+                            <!-- TÊN CÁC CÂU LẠC BỘ -->
+                            <div class="teams-row">
+                                <div class="team-name">
+                                    @match.HomeClub.Name
+                                </div>
+                                <div class="vs-divider">
+                                    VS
+                                </div>
+                                <div class="team-name">
+                                    @match.AwayClub.Name
+                                </div>
+                            </div>
+
+                            <!-- NGÀY GIỜ + SÂN -->
+                            <div class="match-info">
+                                <div class="info-row">
+                                    <span class="info-icon">📅</span>
+                                    <span class="info-text">
+                                        @match.Match.DateTime?.ToString("dd/MM/yyyy HH:mm")
+                                    </span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-icon">📍</span>
+                                    <span class="info-text">
+                                        @match.Match.Stadium
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- NÚT MUA VÉ -->
+                            <a href="/TicketBooking/Buy?matchId=@match.MatchId" 
+                               class="buy-ticket-btn">
+                                🎫 Mua vé ngay
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    }
+</section>
+
+<script>
+    // Add smooth scroll animation when clicking buy ticket
+    document.querySelectorAll('.buy-ticket-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+
+    // Add loading animation
+    window.addEventListener('load', function() {
+        const cards = document.querySelectorAll('.match-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
